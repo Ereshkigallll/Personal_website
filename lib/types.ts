@@ -5,12 +5,14 @@ export type ProjectStatus    = 'active' | 'completed' | 'in-progress'
 export type Project = {
   slug:        string
   key:         string        // "KEY_01"
+  serial?:     string        // e.g. "PRJ-ROB-002"
   title:       string
   subtitle:    string        // one-line description
   category:    ProjectCategory
   tags:        string[]
   status:      ProjectStatus
   description: string
+  date?:       string        // "MMM YYYY"
   image?:      string
   github?:     string
   demo?:       string
