@@ -29,9 +29,10 @@ const config: Config = {
         'grid': '32px 32px',
       },
       boxShadow: {
-        'card': '0 20px 40px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.04)',
-        'key-glow': '0 0 12px rgba(127,255,0,0.15)',
-        'btn-glow': '0 0 15px rgba(127,255,0,0.4)',
+        'card': '0 20px 40px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05)',
+        'glow': '0 0 10px rgba(163,230,53,0.3)',
+        'key-glow': '0 0 12px rgba(163,230,53,0.15)',
+        'btn-glow': '0 0 15px rgba(163,230,53,0.4)',
       },
     },
   },

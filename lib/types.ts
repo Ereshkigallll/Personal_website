@@ -22,13 +22,15 @@ export type ResearchStatus = 'in-progress' | 'published' | 'submitted'
 
 export type Research = {
   id:       string
+  serial:   string           // e.g. "RS-2024-001"
   title:    string
   subtitle: string
   status:   ResearchStatus
   venue?:   string           // journal / conference
-  year?:    number
+  date?:    string           // "MMM YYYY"
   abstract: string
   tags:     string[]
+  authors?: string[]
   link?:    string
 }
 

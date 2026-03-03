@@ -6,7 +6,7 @@ export function cn(...inputs: (string | undefined | false | null)[]) {
 /** Format a date string "YYYY-MM-DD" → "Jan 15, 2025" */
 export function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'month',
+    year: 'numeric',
     month: 'short',
     day: 'numeric',
   })
