@@ -36,7 +36,7 @@ export default function ResearchPage() {
               Scientific Research Archive
             </span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight uppercase flex items-center gap-3 flex-wrap">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase flex items-center gap-3 flex-wrap">
             Research Database
             <span className="font-mono text-xs font-normal text-[var(--color-muted)] border border-[var(--color-border)] px-2 py-0.5">
               V.1.0.0
