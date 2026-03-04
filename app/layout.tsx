@@ -3,6 +3,7 @@ import './globals.css'
 import SideNav from '@/components/layout/SideNav'
 import TopBar from '@/components/layout/TopBar'
 import GridBackground from '@/components/layout/GridBackground'
+import BootScreen from '@/components/layout/BootScreen'
 
 export const metadata: Metadata = {
   title: 'Portfolio — HR Department',
@@ -25,6 +26,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <BootScreen />
         <GridBackground />
         <SideNav />
         {/* TopBar 在 body 层级，与 SideNav 并列，确保 fixed 定位始终相对视口 */}
