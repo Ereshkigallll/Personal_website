@@ -48,10 +48,10 @@ export default function ContactPage() {
             </h1>
           </div>
 
-          {/* Channel ID */}
+          {/* Operator monogram */}
           <div className="hidden md:flex flex-col items-end shrink-0">
-            <span className="font-mono text-5xl font-bold text-[var(--color-border)] leading-none select-none">06</span>
-            <span className="font-mono text-[9px] text-[var(--color-muted)] mt-1">CHANNEL ID</span>
+            <span className="font-mono text-5xl font-bold text-[var(--color-border)] leading-none select-none">YT</span>
+            <span className="font-mono text-[9px] text-[var(--color-muted)] mt-1">OPERATOR</span>
           </div>
         </div>
       </div>

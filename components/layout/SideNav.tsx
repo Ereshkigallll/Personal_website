@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { motion } from 'framer-motion'
 import {
   LayoutGrid,
   Database,
@@ -44,20 +45,26 @@ export default function SideNav() {
               className="group relative flex flex-col items-center w-full"
               title={label}
             >
-              {/* Active indicator */}
-              {active && (
-                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 h-8 bg-[var(--color-accent)] rounded-l-sm" />
-              )}
+              <div className="relative w-10 h-10 flex items-center justify-center">
+                {/* Sliding accent block */}
+                {active && (
+                  <motion.div
+                    layoutId="sidenav-active"
+                    className="absolute inset-0 bg-[var(--color-accent)]"
+                    transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+                  />
+                )}
 
-              <div
-                className={`
-                  w-10 h-10 flex items-center justify-center rounded-lg transition-colors
-                  ${active
-                    ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]'
-                    : 'text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-black/5 dark:hover:bg-white/10'}
-                `}
-              >
-                <Icon size={20} strokeWidth={1.5} />
+                {/* Icon */}
+                <Icon
+                  size={20}
+                  strokeWidth={1.5}
+                  className={`relative z-10 transition-colors ${
+                    active
+                      ? 'text-black'
+                      : 'text-[var(--color-muted)] group-hover:text-[var(--color-text)]'
+                  }`}
+                />
               </div>
 
               {/* Tooltip */}
