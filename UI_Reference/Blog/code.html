@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rhine Lab Development Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&amp;family=Inter:wght@300;400;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#A3E635", 
+              "rhine-black": "#121212",
+              "rhine-gray": "#333333",
+              "background-light": "#F8F9FA", 
+              "background-dark": "#0D0D0E",  
+              "card-light": "rgba(255, 255, 255, 0.65)",
+              "glass-border": "rgba(0, 0, 0, 0.08)",
+              "status-stable": "#22c55e",
+              "status-ongoing": "#eab308",
+              "status-critical": "#ef4444",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            backgroundImage: {
+                'grid-pattern': "linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px)",
+                'diag-stripes': "repeating-linear-gradient(45deg, rgba(0,0,0,0.02), rgba(0,0,0,0.02) 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px)",
+            }
+          },
+        },
+      };
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.05),
+                0 2px 4px -1px rgba(0, 0, 0, 0.03),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+        .rotary-strip {
+            mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+        }
+        .rotary-item {
+            transform-origin: right center;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .rotary-item.active {
+            transform: scale(1.05) translateX(5px);
+            opacity: 1;
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-right: 4px solid #A3E635;
+        }
+        .rotary-item:not(.active) {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        .corner-mark {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-style: solid;
+            border-color: #A3E635;
+            transition: all 0.3s ease;
+        }
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.03;
+            z-index: 50;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        .text-fade-gradient {
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.1) 100%);
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.1) 100%);
+        }
+        .code-block {
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #374151;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            position: relative;
+        }
+        .code-block::before {
+            content: 'CODE_SNIPPET';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #e5e7eb;
+            color: #6b7280;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-bottom-left-radius: 4px;
+        }
+        .log-entry:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 17px;top: 40px;
+            bottom: -30px;
+            width: 1px;
+            background: rgba(0,0,0,0.1);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-background-light text-rhine-black font-sans min-h-screen relative overflow-hidden flex flex-col md:flex-row">
+<div class="fixed inset-0 pointer-events-none bg-grid-pattern bg-[length:40px_40px] z-0 opacity-60"></div>
+<div class="fixed inset-0 pointer-events-none bg-diag-stripes z-0 opacity-40"></div>
+<div class="noise-overlay"></div>
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20vw] font-black text-black opacity-[0.02] pointer-events-none z-0 select-none whitespace-nowrap" style="transform: translate(-50%, -50%) rotate(-15deg);">
+        RHINE LAB
+    </div>
+<nav class="w-full md:w-32 lg:w-48 h-24 md:h-screen relative z-30 flex md:flex-col items-center justify-center md:py-8 border-b md:border-b-0 md:border-r border-gray-200 bg-white/40 backdrop-blur-sm">
+<div class="hidden md:flex flex-col items-center mb-8 absolute top-8">
+<div class="w-10 h-10 border-2 border-rhine-black flex items-center justify-center mb-2 bg-white">
+<div class="w-4 h-4 bg-primary rotate-45"></div>
+</div>
+<div class="text-[9px] font-mono tracking-[0.2em] font-bold">RL-SYS</div>
+</div>
+<div class="rotary-strip w-full h-full flex md:flex-col items-center justify-center gap-6 overflow-hidden py-12">
+<div class="rotary-item group cursor-pointer w-20 h-20 md:w-full md:h-24 flex md:flex-row flex-col items-center justify-end md:pr-4 relative opacity-40 hover:opacity-100">
+<div class="text-right mr-3 hidden md:block">
+<div class="text-xs font-bold font-mono group-hover:text-primary transition-colors">DASHBOARD</div>
+<div class="text-[10px] text-gray-400">OVERVIEW</div>
+</div>
+<div class="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-gray-400 group-hover:text-rhine-black text-lg">grid_view</span>
+</div>
+</div>
+<div class="rotary-item active group cursor-pointer w-20 h-20 md:w-full md:h-24 flex md:flex-row flex-col items-center justify-end md:pr-4 relative">
+<div class="text-right mr-3 hidden md:block">
+<div class="text-xs font-bold font-mono group-hover:text-primary transition-colors">DEV_LOGS</div>
+<div class="text-[10px] text-gray-400">SYSTEM_LOGS</div>
+</div>
+<div class="w-12 h-12 rounded-lg bg-gray-100 border border-gray-300 flex items-center justify-center shadow-sm relative overflow-hidden group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-gray-700 text-xl">terminal</span>
+<div class="absolute bottom-0 left-0 w-full h-1 bg-primary"></div>
+</div>
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-rhine-black rounded-l-full md:block hidden"></div>
+</div>
+<div class="rotary-item group cursor-pointer w-20 h-20 md:w-full md:h-24 flex md:flex-row flex-col items-center justify-end md:pr-4 relative opacity-40 hover:opacity-100">
+<div class="text-right mr-3 hidden md:block">
+<div class="text-xs font-bold font-mono group-hover:text-primary transition-colors">PROJECTS</div>
+<div class="text-[10px] text-gray-400">ARCHIVE</div>
+</div>
+<div class="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-gray-400 group-hover:text-rhine-black text-lg">folder_open</span>
+</div>
+</div>
+<div class="rotary-item group cursor-pointer w-20 h-20 md:w-full md:h-24 flex md:flex-row flex-col items-center justify-end md:pr-4 relative opacity-40 hover:opacity-100">
+<div class="text-right mr-3 hidden md:block">
+<div class="text-xs font-bold font-mono group-hover:text-primary transition-colors">NETWORK</div>
+<div class="text-[10px] text-gray-400">CONNECT</div>
+</div>
+<div class="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-gray-400 group-hover:text-rhine-black text-lg">network_node</span>
+</div>
+</div>
+</div>
+<div class="hidden md:flex flex-col items-center absolute bottom-8 gap-4 w-full">
+<div class="w-[1px] h-12 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
+<button class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+<span class="material-symbols-outlined text-gray-400 text-lg">settings</span>
+</button>
+</div>
+</nav>
+<main class="flex-1 relative p-6 md:p-12 overflow-y-auto h-screen z-10 flex flex-col">
+<header class="flex justify-between items-start mb-8 border-b border-gray-200 pb-4">
+<div class="w-full">
+<div class="flex items-center gap-2 mb-2">
+<span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+<h2 class="font-mono text-[10px] tracking-[0.2em] text-gray-500 uppercase">Rhine Lab Ecological Section</h2>
+</div>
+<h1 class="text-4xl md:text-6xl font-[800] tracking-tighter uppercase text-rhine-black text-fade-gradient w-full">
+                    Development <span class="text-primary">Log</span>
+</h1>
+</div>
+<div class="hidden md:flex items-end flex-col whitespace-nowrap">
+<div class="text-sm font-mono text-rhine-gray bg-primary/20 px-2 py-1 rounded mb-1">USER: DOCTOR</div>
+<div class="text-[10px] font-mono text-gray-400 text-right">LAST LOGIN: 10:42 AM</div>
+</div>
+</header>
+<div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 relative max-w-7xl mx-auto w-full">
+<div class="lg:col-span-3 flex flex-col gap-6 sticky top-0">
+<div class="glass-panel p-4 rounded-lg">
+<h3 class="font-mono text-[10px] text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-200 pb-2">Filter Logs</h3>
+<div class="flex flex-col gap-2">
+<button class="flex items-center justify-between p-2 rounded hover:bg-gray-50 transition-colors group">
+<span class="text-xs font-bold text-rhine-black group-hover:text-primary">ALL_ENTRIES</span>
+<span class="text-[10px] font-mono text-gray-400">24</span>
+</button>
+<button class="flex items-center justify-between p-2 rounded hover:bg-gray-50 transition-colors group">
+<span class="text-xs font-bold text-rhine-black group-hover:text-primary">EXPERIMENTS</span>
+<span class="text-[10px] font-mono text-gray-400">12</span>
+</button>
+<button class="flex items-center justify-between p-2 rounded hover:bg-gray-50 transition-colors group">
+<span class="text-xs font-bold text-rhine-black group-hover:text-primary">MAINTENANCE</span>
+<span class="text-[10px] font-mono text-gray-400">08</span>
+</button>
+<button class="flex items-center justify-between p-2 rounded hover:bg-gray-50 transition-colors group">
+<span class="text-xs font-bold text-rhine-black group-hover:text-primary">INCIDENTS</span>
+<span class="text-[10px] font-mono text-gray-400">04</span>
+</button>
+</div>
+</div>
+<div class="glass-panel p-4 rounded-lg flex flex-col gap-4">
+<h3 class="font-mono text-[10px] text-gray-400 uppercase tracking-widest mb-1 border-b border-gray-200 pb-2">System Status</h3>
+<div class="flex items-center justify-between">
+<span class="text-xs font-mono text-gray-500">SERVER_LOAD</span>
+<div class="w-24 h-1 bg-gray-200 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[35%]"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-mono text-gray-500">DB_INTEGRITY</span>
+<span class="text-xs font-mono text-status-stable">100%</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-mono text-gray-500">NET_LATENCY</span>
+<span class="text-xs font-mono text-rhine-black">12ms</span>
+</div>
+</div>
+</div>
+<div class="lg:col-span-9 flex flex-col gap-8 pb-12">
+<article class="glass-panel p-6 relative rounded-lg log-entry">
+<div class="absolute left-[-29px] top-8 w-3 h-3 bg-primary border-2 border-white rounded-full z-10 shadow-md hidden lg:block"></div>
+<header class="flex flex-col md:flex-row md:items-center justify-between mb-4 border-b border-gray-100 pb-4 gap-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-rhine-black text-white flex items-center justify-center font-mono text-xs font-bold rounded">01</div>
+<div>
+<h2 class="text-xl font-bold text-rhine-black leading-tight">Neural Interface Protocol V3.2 Update</h2>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-[10px] font-mono text-gray-400">LOG_ID: #8921-A</span>
+<span class="text-[10px] font-mono text-gray-300">|</span>
+<span class="text-[10px] font-mono text-primary font-bold">2023-10-24 14:00</span>
+</div>
+</div>
+</div>
+<span class="px-2 py-1 bg-green-100 text-status-stable text-[10px] font-mono font-bold border border-green-200 rounded uppercase tracking-wider self-start md:self-center">
+                    Stable
+                </span>
+</header>
+<div class="prose prose-sm max-w-none text-rhine-gray">
+<p class="mb-4">
+                    Optimization of signal propagation latency completed. The new algorithm reduces noise by 15% in high-interference environments. Preliminary tests on the test subjects show promising cognitive response rates without significant adrenal spikes.
+                </p>
+<div class="code-block mb-4 overflow-x-auto">
+<pre><code><span class="text-purple-600">function</span> <span class="text-blue-600">optimizeSignal</span>(input_stream) {
+  <span class="text-gray-500">// Applying originium-based filter</span>
+  <span class="text-purple-600">const</span> filtered = input_stream.<span class="text-blue-600">filter</span>(n =&gt; n.amplitude &gt; <span class="text-orange-600">0.5</span>);
+  <span class="text-purple-600">return</span> filtered.<span class="text-blue-600">map</span>(s =&gt; s * COGNITIVE_COEFFICIENT);
+}</code></pre>
+</div>
+<p>
+                    Next phase involves integration with the exoskeleton motor cortex. Careful calibration is required to prevent feedback loops.
+                </p>
+</div>
+<div class="mt-6 flex items-center gap-4 pt-4 border-t border-gray-100">
+<button class="flex items-center gap-2 text-xs font-mono text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">visibility</span> READ_FULL_LOG
+                </button>
+<button class="flex items-center gap-2 text-xs font-mono text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">folder_zip</span> ATTACHMENTS (2)
+                </button>
+</div>
+<div class="corner-mark border-t-2 border-l-2 top-0 left-0"></div>
+<div class="corner-mark border-b-2 border-r-2 bottom-0 right-0"></div>
+</article>
+<article class="glass-panel p-6 relative rounded-lg log-entry">
+<div class="absolute left-[-29px] top-8 w-3 h-3 bg-gray-300 border-2 border-white rounded-full z-10 shadow-md hidden lg:block"></div>
+<header class="flex flex-col md:flex-row md:items-center justify-between mb-4 border-b border-gray-100 pb-4 gap-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-gray-200 text-gray-600 flex items-center justify-center font-mono text-xs font-bold rounded">02</div>
+<div>
+<h2 class="text-xl font-bold text-rhine-black leading-tight">Originium Reactor Containment breach drill</h2>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-[10px] font-mono text-gray-400">LOG_ID: #8920-C</span>
+<span class="text-[10px] font-mono text-gray-300">|</span>
+<span class="text-[10px] font-mono text-primary font-bold">2023-10-22 09:15</span>
+</div>
+</div>
+</div>
+<span class="px-2 py-1 bg-yellow-100 text-status-ongoing text-[10px] font-mono font-bold border border-yellow-200 rounded uppercase tracking-wider self-start md:self-center">
+                    Ongoing
+                </span>
+</header>
+<div class="prose prose-sm max-w-none text-rhine-gray">
+<p class="mb-4">
+                    Scheduled maintenance of the containment field generators revealed micro-fractures in Sector 4 plating. 
+                    Immediate patch applied. Simulation of breach scenario initiated to test automated lockdown protocols.
+                </p>
+<div class="grid grid-cols-2 gap-4 mb-4">
+<div class="bg-gray-50 p-3 rounded border border-gray-200">
+<span class="block text-[10px] font-mono text-gray-400 uppercase">Sector 4 Integrity</span>
+<span class="block text-lg font-bold text-status-ongoing">87%</span>
+</div>
+<div class="bg-gray-50 p-3 rounded border border-gray-200">
+<span class="block text-[10px] font-mono text-gray-400 uppercase">Lockdown Response</span>
+<span class="block text-lg font-bold text-rhine-black">0.4s</span>
+</div>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-4 pt-4 border-t border-gray-100">
+<button class="flex items-center gap-2 text-xs font-mono text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">visibility</span> READ_FULL_LOG
+                </button>
+</div>
+</article>
+<article class="glass-panel p-6 relative rounded-lg log-entry">
+<div class="absolute left-[-29px] top-8 w-3 h-3 bg-gray-300 border-2 border-white rounded-full z-10 shadow-md hidden lg:block"></div>
+<header class="flex flex-col md:flex-row md:items-center justify-between mb-4 border-b border-gray-100 pb-4 gap-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-gray-200 text-gray-600 flex items-center justify-center font-mono text-xs font-bold rounded">03</div>
+<div>
+<h2 class="text-xl font-bold text-rhine-black leading-tight">UI/UX Overhaul for Operator Terminals</h2>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-[10px] font-mono text-gray-400">LOG_ID: #8918-F</span>
+<span class="text-[10px] font-mono text-gray-300">|</span>
+<span class="text-[10px] font-mono text-primary font-bold">2023-10-18 16:30</span>
+</div>
+</div>
+</div>
+<span class="px-2 py-1 bg-green-100 text-status-stable text-[10px] font-mono font-bold border border-green-200 rounded uppercase tracking-wider self-start md:self-center">
+                    Completed
+                </span>
+</header>
+<div class="prose prose-sm max-w-none text-rhine-gray">
+<p>
+                    Finalized the color palette for the new operator terminals. Switched to high-contrast green on dark grey to reduce eye strain during night operations. 
+                    Implemented new SVG-based icons for faster rendering on legacy hardware.
+                </p>
+</div>
+</article>
+<div class="flex justify-center mt-4">
+<button class="px-6 py-2 bg-white border border-gray-300 text-xs font-mono font-bold text-rhine-black hover:bg-rhine-black hover:text-white transition-all uppercase tracking-widest rounded shadow-sm">
+                    Load_More_Entries [+]
+                </button>
+</div>
+</div>
+</div>
+</main>
+<footer class="fixed bottom-0 right-0 p-4 z-50 pointer-events-none hidden md:block">
+<div class="glass-panel px-4 py-2 rounded-full flex items-center gap-4 pointer-events-auto">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+<span class="text-[10px] font-mono font-bold text-gray-600">SYS_ONLINE</span>
+</div>
+<span class="text-gray-300 text-[10px]">|</span>
+<span class="text-[10px] font-mono text-gray-500">v2.4.1-stable</span>
+</div>
+</footer>
+
+</body></html>

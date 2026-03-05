@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
+import { useBootDone } from '@/lib/boot-context'
 
 /* ─── Status labels that cycle as progress increases ─── */
 const STATUS_STEPS = [
@@ -34,6 +35,7 @@ const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1]
 const EASE_SPLIT:    [number, number, number, number] = [0.76, 0, 0.24, 1]
 
 export default function BootScreen() {
+  const { setBootDone }               = useBootDone()
   const [phase, setPhase]             = useState<'loading' | 'authorised' | 'splitting' | 'done'>('loading')
   const [displayProgress, setDisplay] = useState(0)
   const [complete, setComplete]       = useState(false)
@@ -62,7 +64,7 @@ export default function BootScreen() {
       .then(() => new Promise<void>(r => setTimeout(r, 180)))   // brief pause at 100%
       .then(() => { setPhase('authorised'); return new Promise<void>(r => setTimeout(r, 850)) })
       .then(() => { setPhase('splitting');  return new Promise<void>(r => setTimeout(r, 1050)) })
-      .then(() => setPhase('done'))
+      .then(() => { setBootDone(true); setPhase('done') })
 
     return () => unsub()
   }, [progress])

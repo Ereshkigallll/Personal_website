@@ -5,6 +5,7 @@ import TopBar from '@/components/layout/TopBar'
 import GridBackground from '@/components/layout/GridBackground'
 import BootScreen from '@/components/layout/BootScreen'
 import { LanguageProvider } from '@/lib/language'
+import { BootProvider } from '@/lib/boot-context'
 
 export const metadata: Metadata = {
   title: 'Portfolio — HR Department',
@@ -27,24 +28,26 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <LanguageProvider>
-          <BootScreen />
-          <GridBackground />
-          <SideNav />
-          <TopBar />
+        <BootProvider>
+          <LanguageProvider>
+            <BootScreen />
+            <GridBackground />
+            <SideNav />
+            <TopBar />
 
-          <div
-            className="relative z-10 h-screen flex flex-col"
-            style={{ marginLeft: 'var(--sidebar-width)' }}
-          >
-            <main
-              className="flex-1 overflow-y-auto px-8 pb-8"
-              style={{ paddingTop: 'calc(var(--topbar-height) + 1.5rem)' }}
+            <div
+              className="relative z-10 h-screen flex flex-col"
+              style={{ marginLeft: 'var(--sidebar-width)' }}
             >
-              {children}
-            </main>
-          </div>
-        </LanguageProvider>
+              <main
+                className="flex-1 overflow-y-auto px-8 pb-8"
+                style={{ paddingTop: 'calc(var(--topbar-height) + 1.5rem)' }}
+              >
+                {children}
+              </main>
+            </div>
+          </LanguageProvider>
+        </BootProvider>
       </body>
     </html>
   )

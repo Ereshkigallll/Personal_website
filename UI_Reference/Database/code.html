@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rhine Lab Skills Database</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&amp;family=Inter:wght@300;400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#A3E635", 
+              "rhine-black": "#1A1A1A",
+              "rhine-gray": "#555555",
+              "background-light": "#F2F2F0", 
+              "background-dark": "#0D0D0E",  
+              "card-light": "rgba(255, 255, 255, 0.95)",
+              "card-dark": "rgba(20, 20, 20, 0.9)",
+              "accent-line": "rgba(163, 230, 53, 0.4)",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            boxShadow: {
+                'glow': '0 0 10px rgba(163, 230, 53, 0.3)',
+                'card-float': '0 10px 30px -5px rgba(0, 0, 0, 0.03)',
+                'key-glow': '0 0 12px rgba(163, 230, 53, 0.15)',
+                'btn-glow': '0 0 15px rgba(163, 230, 53, 0.4)',
+            },
+            backgroundImage: {
+                'grid-pattern': "linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)",
+                'grid-pattern-dark': "linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)",
+            }
+          },
+        },
+      };
+    </script>
+<style>
+        .acrylic-panel {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        }
+        .dark .acrylic-panel {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+        .bg-grid-lg {
+            background-size: 40px 40px;
+        }
+        .writing-mode-vertical {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+        .skill-bar-bg {
+            background-color: #E5E5E5;
+        }
+        .dark .skill-bar-bg {
+            background-color: #333;
+        }
+        .skill-bar-fill {
+            background-color: #1A1A1A;
+        }
+        .dark .skill-bar-fill {
+            background-color: #A3E635;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-rhine-black dark:text-gray-200 font-sans min-h-screen relative overflow-x-hidden selection:bg-primary selection:text-black transition-colors duration-300 flex">
+<div class="fixed inset-0 pointer-events-none bg-grid-pattern dark:bg-grid-pattern-dark bg-grid-lg z-0"></div>
+<aside class="hidden md:flex flex-col w-20 h-screen border-r border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-black/20 backdrop-blur-sm z-40 relative items-center py-8 fixed left-0 top-0">
+<div class="mb-10 flex flex-col items-center">
+<div class="w-10 h-10 bg-black text-white flex items-center justify-center font-bold text-xl mb-4">Y</div>
+</div>
+<nav class="flex-1 flex flex-col items-center w-full gap-8">
+<a class="group relative flex flex-col items-center w-full" href="#">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-gray-400 hover:text-rhine-black dark:hover:text-white transition-colors mb-1">
+<span class="material-symbols-outlined text-2xl">grid_view</span>
+</div>
+<span class="text-[9px] font-mono font-bold tracking-widest text-gray-500 hidden lg:block opacity-0 group-hover:opacity-100 absolute left-full ml-4 bg-black text-white px-2 py-1 rounded whitespace-nowrap transition-opacity">DASHBOARD</span>
+</a>
+<a class="group relative flex flex-col items-center w-full" href="#">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-l-sm"></div>
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary mb-1">
+<span class="material-symbols-outlined text-2xl">database</span>
+</div>
+<span class="text-[9px] font-mono font-bold tracking-widest text-primary hidden lg:block opacity-0 group-hover:opacity-100 absolute left-full ml-4 bg-black text-white px-2 py-1 rounded whitespace-nowrap transition-opacity">DATABASE</span>
+</a>
+<a class="group relative flex flex-col items-center w-full" href="#">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-gray-400 hover:text-rhine-black dark:hover:text-white transition-colors mb-1">
+<span class="material-symbols-outlined text-2xl">folder_data</span>
+</div>
+<span class="text-[9px] font-mono font-bold tracking-widest text-gray-500 hidden lg:block opacity-0 group-hover:opacity-100 absolute left-full ml-4 bg-black text-white px-2 py-1 rounded whitespace-nowrap transition-opacity">PROJECTS</span>
+</a>
+<a class="group relative flex flex-col items-center w-full" href="#">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-gray-400 hover:text-rhine-black dark:hover:text-white transition-colors mb-1">
+<span class="material-symbols-outlined text-2xl">terminal</span>
+</div>
+<span class="text-[9px] font-mono font-bold tracking-widest text-gray-500 hidden lg:block opacity-0 group-hover:opacity-100 absolute left-full ml-4 bg-black text-white px-2 py-1 rounded whitespace-nowrap transition-opacity">SYSTEM_LOGS</span>
+</a>
+<a class="group relative flex flex-col items-center w-full" href="#">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-gray-400 hover:text-rhine-black dark:hover:text-white transition-colors mb-1">
+<span class="material-symbols-outlined text-2xl">satellite_alt</span>
+</div>
+<span class="text-[9px] font-mono font-bold tracking-widest text-gray-500 hidden lg:block opacity-0 group-hover:opacity-100 absolute left-full ml-4 bg-black text-white px-2 py-1 rounded whitespace-nowrap transition-opacity">UPLINK</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col items-center gap-4">
+<div class="w-1 h-12 bg-gray-200 dark:bg-gray-800"></div>
+<div class="text-[8px] font-mono text-gray-400 rotate-180 writing-mode-vertical">V.2.4.0</div>
+</div>
+</aside>
+<main class="flex-1 relative flex flex-col p-6 md:p-12 overflow-y-auto h-screen ml-0 md:ml-20">
+<div class="absolute top-8 left-8 md:left-12 z-10">
+<h1 class="font-mono text-xs font-bold tracking-widest uppercase opacity-40">Portfolio <span class="mx-2">//</span> HR Department</h1>
+</div>
+<div class="absolute top-8 right-8 z-10 flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1 bg-white/50 dark:bg-black/20 backdrop-blur border border-gray-200 dark:border-gray-700 rounded-full">
+<div class="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
+<span class="text-[9px] font-mono font-bold tracking-wider">CONNECTED</span>
+</div>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined text-sm opacity-60">contrast</span>
+</button>
+</div>
+<div class="w-full max-w-[1400px] mx-auto z-20 mt-16 md:mt-20 flex flex-col gap-6">
+<div class="acrylic-panel bg-card-light dark:bg-card-dark shadow-card-float p-8 md:p-12 w-full relative overflow-hidden">
+<div class="absolute top-16 left-12 right-12 h-px bg-gray-200 dark:bg-gray-700"></div>
+<div class="relative z-10">
+<div class="font-mono text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Module_04</div>
+<h2 class="text-5xl md:text-6xl font-bold tracking-tighter text-rhine-black dark:text-white mb-2 bg-clip-text">
+                    DATABASE
+                 </h2>
+<p class="font-mono text-sm text-gray-600 dark:text-gray-400 mt-4">
+                    Skills · Tools · Hardware platforms
+                 </p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="acrylic-panel bg-card-light dark:bg-card-dark shadow-card-float p-8 h-full flex flex-col">
+<div class="flex items-center gap-4 mb-8">
+<h3 class="font-mono text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500">Languages</h3>
+<div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+</div>
+<div class="space-y-8">
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">Python</span>
+<span class="font-mono text-[10px] font-bold text-primary">90%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[90%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">TypeScript</span>
+<span class="font-mono text-[10px] font-bold text-primary">82%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[82%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">C++</span>
+<span class="font-mono text-[10px] font-bold text-primary">75%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[75%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">Dart</span>
+<span class="font-mono text-[10px] font-bold text-primary">70%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[70%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">C#</span>
+<span class="font-mono text-[10px] font-bold text-primary">65%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[65%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="acrylic-panel bg-card-light dark:bg-card-dark shadow-card-float p-8 h-full flex flex-col">
+<div class="flex items-center gap-4 mb-8">
+<h3 class="font-mono text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500">Frameworks &amp; Tools</h3>
+<div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+</div>
+<div class="space-y-8">
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">ROS2</span>
+<span class="font-mono text-[10px] font-bold text-primary">80%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[80%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">Flutter</span>
+<span class="font-mono text-[10px] font-bold text-primary">78%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[78%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">Next.js</span>
+<span class="font-mono text-[10px] font-bold text-primary">75%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[75%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">Unity (VR)</span>
+<span class="font-mono text-[10px] font-bold text-primary">72%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[72%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">TensorFlow</span>
+<span class="font-mono text-[10px] font-bold text-primary">60%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[60%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="acrylic-panel bg-card-light dark:bg-card-dark shadow-card-float p-8 h-full flex flex-col">
+<div class="flex items-center gap-4 mb-8">
+<h3 class="font-mono text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500">Hardware Platforms</h3>
+<div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+</div>
+<div class="space-y-8">
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">ESP32 / ESP8266</span>
+<span class="font-mono text-[10px] font-bold text-primary">88%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[88%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">Raspberry Pi</span>
+<span class="font-mono text-[10px] font-bold text-primary">85%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[85%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">Arduino</span>
+<span class="font-mono text-[10px] font-bold text-primary">85%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[85%]"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="font-mono font-bold text-sm text-rhine-black dark:text-white">STM32</span>
+<span class="font-mono text-[10px] font-bold text-primary">60%</span>
+</div>
+<div class="h-[2px] w-full skill-bar-bg relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full skill-bar-fill w-[60%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>
