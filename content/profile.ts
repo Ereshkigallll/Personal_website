@@ -14,8 +14,8 @@ export const profile = {
   } satisfies BiText,
 
   clearanceLevel: 5,
-  status:         'open-for-work' as const,
-  statusLabel:    { en: 'Open for Work', zh: '寻求合作' } satisfies BiText,
+  status:         'in-post' as const,
+  statusLabel:    { en: 'Currently in Post', zh: '现已在职' } satisfies BiText,
 
   /** Pinned projects shown in the profile panel — order matters */
   activeProjects: [

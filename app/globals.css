@@ -100,3 +100,26 @@ body {
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+/* ── Marquee ticker ─────────────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0);    }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 32s linear infinite; }
+
+/* ── HUD scanline texture ───────────────────────────────────────────── */
+.hud-scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px,
+    transparent 1px, transparent 3px
+  );
+}
+.dark .hud-scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px,
+    transparent 1px, transparent 3px
+  );
+}

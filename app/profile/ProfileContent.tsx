@@ -3,9 +3,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion'
 import Link from 'next/link'
-import { Database, ArrowRight } from 'lucide-react'
+import { Database, ArrowRight, Mail, ArrowUpRight } from 'lucide-react'
 import { profile } from '@/content/profile'
 import { projects } from '@/content/projects'
+import { researchItems } from '@/content/research'
+import { skills } from '@/content/skills'
 import { useLanguage } from '@/lib/language'
 import { useBootDone } from '@/lib/boot-context'
 
@@ -59,6 +61,29 @@ function useScramble(target: string, active: boolean, startDelay = 0): string {
   return display
 }
 
+/* ── useTypewriter ──────────────────────────────────────────────────── */
+function useTypewriter(text: string, active: boolean, speed = 24, startDelay = 0) {
+  const [shown, setShown] = useState('')
+  const [done,  setDone]  = useState(false)
+
+  useEffect(() => {
+    if (!active) { setShown(text); setDone(true); return }
+    setShown(''); setDone(false)
+    let i = 0
+    let intervalId: ReturnType<typeof setInterval>
+    const startId = setTimeout(() => {
+      intervalId = setInterval(() => {
+        i++
+        setShown(text.slice(0, i))
+        if (i >= text.length) { clearInterval(intervalId); setDone(true) }
+      }, speed)
+    }, startDelay)
+    return () => { clearTimeout(startId); clearInterval(intervalId) }
+  }, [text, active, speed, startDelay])
+
+  return { shown, done }
+}
+
 /* ── Live Network Metric ───────────────────────────────────────────── */
 const INITIAL_BARS = [60, 100, 80, 140, 60, 40, 100, 120]
 
@@ -104,6 +129,133 @@ function NetworkMetric({ label }: { label: string }) {
           />
         ))}
       </div>
+    </div>
+  )
+}
+
+/* ── Local terminal clock ──────────────────────────────────────────── */
+function LocalClock() {
+  const [now, setNow] = useState<Date | null>(null)
+
+  useEffect(() => {
+    setNow(new Date())
+    const id = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  const time = now ? now.toLocaleTimeString('en-GB', { hour12: false }) : '--:--:--'
+  const date = now ? now.toLocaleDateString('en-CA')                    : '----/--/--'
+  const tz   = now ? Intl.DateTimeFormat().resolvedOptions().timeZone   : '—'
+
+  return (
+    <div className="flex items-center justify-between border border-[var(--color-border)] bg-[var(--color-surface)]/50 px-3 py-2 font-mono">
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-breathe shrink-0" />
+        <span className="text-[9px] text-[var(--color-muted)] uppercase tracking-wider truncate">
+          {date} · {tz}
+        </span>
+      </div>
+      <span className="text-sm font-bold text-[var(--color-accent)] tabular-nums tracking-wider shrink-0">
+        {time}
+      </span>
+    </div>
+  )
+}
+
+/* ── Status ticker ─────────────────────────────────────────────────── */
+const TICKER_ITEMS = [
+  'SYSTEM ONLINE',
+  'STATUS // OPEN FOR WORK',
+  'NODE // COLUMBIA_HQ',
+  'CLEARANCE // LVL.5 GRANTED',
+  'UPLINK // STABLE',
+  'HCI · VR · ROBOTICS · IOT',
+]
+
+function TickerRow() {
+  return (
+    <div className="flex items-center shrink-0">
+      {TICKER_ITEMS.map((it, i) => (
+        <span key={i} className="flex items-center shrink-0">
+          <span className="font-mono text-[9px] tracking-widest uppercase text-[var(--color-muted)]">{it}</span>
+          <span className="mx-5 text-[8px] text-[var(--color-accent)]">◆</span>
+        </span>
+      ))}
+    </div>
+  )
+}
+
+/* ── Stat (count-up) ───────────────────────────────────────────────── */
+function Stat({ label, value, active, delay }: { label: string; value: number; active: boolean; delay: number }) {
+  const count   = useMotionValue(0)
+  const display = useTransform(count, v => String(Math.round(v)).padStart(2, '0'))
+
+  useEffect(() => {
+    if (!active) return
+    const anim = animate(count, value, { duration: 1.4, delay, ease: [0.22, 1, 0.36, 1] })
+    return () => anim.stop()
+  }, [active, count, value, delay])
+
+  return (
+    <div className="flex flex-col">
+      <motion.span className="font-mono text-3xl 2xl:text-4xl font-bold tabular-nums leading-none">
+        {display}
+      </motion.span>
+      <span className="font-mono text-[9px] text-[var(--color-muted)] uppercase tracking-wider mt-1.5">
+        {label}
+      </span>
+    </div>
+  )
+}
+
+/* ── Email uplink (obfuscated against scrapers) ────────────────────── */
+function EmailButton() {
+  const { t } = useLanguage()
+  const [addr, setAddr] = useState('')
+
+  // Stored reversed so the plain address never appears in the static HTML.
+  // Only the client restores it after hydration → bots that don't run JS see nothing.
+  useEffect(() => {
+    setAddr('moc.liamg@9260.gnahz.ty'.split('').reverse().join(''))
+  }, [])
+
+  return (
+    <a
+      href={addr ? `mailto:${addr}` : undefined}
+      onClick={e => { if (!addr) e.preventDefault() }}
+      className="group flex items-center justify-between gap-3 border border-[var(--color-border)] bg-[var(--color-surface)]/50 px-4 py-3 hover:border-[var(--color-accent)] hover:shadow-btn-glow transition-all"
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <Mail size={16} className="shrink-0 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors" />
+        <span className="font-mono text-[11px] text-[var(--color-text)] truncate">
+          {addr || t('EMAIL', '邮箱')}
+        </span>
+      </div>
+      <ArrowUpRight size={14} className="shrink-0 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors" />
+    </a>
+  )
+}
+
+/* ── Geometric avatar ──────────────────────────────────────────────── */
+function GeometricAvatar() {
+  return (
+    <div className="relative w-16 h-16 2xl:w-20 2xl:h-20 shrink-0 border border-[var(--color-border)] bg-[var(--color-text)] overflow-hidden">
+      <div
+        className="absolute inset-0 opacity-40"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, rgba(163,230,53,0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(163,230,53,0.2) 1px, transparent 1px)',
+          backgroundSize: '8px 8px',
+        }}
+      />
+      <svg viewBox="0 0 64 64" fill="none" className="absolute inset-0 h-full w-full">
+        <line x1="0" y1="64" x2="64" y2="0" stroke="var(--color-accent)" strokeWidth="0.5" opacity="0.25" />
+        <rect x="14" y="14" width="36" height="36" stroke="var(--color-accent)" strokeWidth="1.5" transform="rotate(45 32 32)" opacity="0.5" />
+        <rect x="25" y="25" width="14" height="14" fill="var(--color-accent)" />
+        <rect x="29" y="29" width="6" height="6" fill="var(--color-text)" />
+      </svg>
+      <span className="absolute left-1 top-1 h-1.5 w-1.5 border-l border-t border-[var(--color-accent)]" />
+      <span className="absolute bottom-1 right-1 h-1.5 w-1.5 border-b border-r border-[var(--color-accent)]" />
     </div>
   )
 }
@@ -177,15 +329,23 @@ export default function ProfileContent() {
 
   const revealed = phase === 'revealed'
 
+  /* Bio typewriter — types out once the card is revealed */
+  const bioText = t(profile.bio.en, profile.bio.zh)
+  const { shown: bioShown, done: bioDone } = useTypewriter(bioText, revealed && !skipAnim, 24, 450)
+
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="min-h-full flex flex-col py-6">
+      <div className="w-full max-w-5xl xl:max-w-6xl 2xl:max-w-[88rem] mx-auto my-auto">
       <motion.div
         style={{ transformOrigin: 'center center' }}
         initial={{ scaleY: 0, opacity: 0 }}
         animate={ready ? { scaleY: 1, opacity: 1 } : { scaleY: 0, opacity: 0 }}
         transition={{ duration: skipAnim ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="panel-acrylic rounded-none grid grid-cols-1 lg:grid-cols-12 overflow-hidden min-h-[520px] relative">
+        <div className="panel-acrylic rounded-none grid grid-cols-1 lg:grid-cols-12 overflow-hidden min-h-[520px] xl:min-h-[64vh] 2xl:min-h-[72vh] relative">
+
+          {/* HUD scanline texture */}
+          <div className="absolute inset-0 hud-scanlines pointer-events-none z-[1]" />
 
           {/* ── Decrypt overlay ── */}
           <AnimatePresence>
@@ -196,6 +356,7 @@ export default function ProfileContent() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, ease: 'easeInOut' }}
               >
+                <div className="w-full flex justify-center origin-center xl:scale-110 2xl:scale-[1.2]">
                 <AnimatePresence mode="wait">
 
                   {/* Phase: expanding — minimal pulse */}
@@ -295,28 +456,37 @@ export default function ProfileContent() {
                   )}
 
                 </AnimatePresence>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* ── Left: Identity ── */}
           <div
-            className={`lg:col-span-7 p-10 md:p-12 border-b lg:border-b-0 lg:border-r border-[var(--color-border)] flex flex-col justify-between relative transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0'}`}
+            className={`lg:col-span-7 p-10 md:p-12 2xl:p-16 border-b lg:border-b-0 lg:border-r border-[var(--color-border)] flex flex-col justify-between relative transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0'}`}
           >
             {/* Corner bracket */}
             <div className="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-[var(--color-text)] opacity-10 pointer-events-none" />
 
             <div>
-              {/* ID badge */}
-              <div className="inline-flex items-center gap-2 mb-8 border border-[var(--color-border)] px-2 py-1 bg-[var(--color-surface)]/50">
-                <svg className="w-3.5 h-3.5 text-[var(--color-muted)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="16" y2="10"/><line x1="12" y1="14" x2="16" y2="14"/>
-                </svg>
-                <span className="font-mono text-[10px] tracking-widest font-bold">{profile.id}</span>
+              {/* Avatar + ID badge */}
+              <div className="flex items-center gap-4 mb-8">
+                <GeometricAvatar />
+                <div className="flex flex-col gap-1.5">
+                  <div className="inline-flex items-center gap-2 self-start border border-[var(--color-border)] px-2 py-1 bg-[var(--color-surface)]/50">
+                    <svg className="w-3.5 h-3.5 text-[var(--color-muted)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="16" y2="10"/><line x1="12" y1="14" x2="16" y2="14"/>
+                    </svg>
+                    <span className="font-mono text-[10px] tracking-widest font-bold">{profile.id}</span>
+                  </div>
+                  <span className="font-mono text-[9px] text-[var(--color-muted)] uppercase tracking-wider">
+                    {t('Verified Identity', '已验证身份')}
+                  </span>
+                </div>
               </div>
 
               {/* Name */}
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tighter leading-none mb-2">
+              <h1 className="text-5xl md:text-7xl 2xl:text-8xl font-bold tracking-tighter leading-none mb-2">
                 {profile.name}
               </h1>
               {/* Accent underline */}
@@ -342,11 +512,18 @@ export default function ProfileContent() {
                 </p>
               </div>
 
-              {/* Bio quote */}
+              {/* Bio quote — typed out */}
               <div className="mt-10 p-4 bg-[var(--color-bg)]/70 border-l-2 border-[var(--color-accent)]">
-                <p className="font-mono text-[10px] leading-relaxed text-[var(--color-muted)] max-w-xs">
-                  "{t(profile.bio.en, profile.bio.zh)}"
+                <p className="font-mono text-[10px] leading-relaxed text-[var(--color-muted)] max-w-xs min-h-[3.5em]">
+                  "{bioShown}"{!bioDone && <span className="text-[var(--color-accent)] animate-pulse">▋</span>}
                 </p>
+              </div>
+
+              {/* Stats overview */}
+              <div className="mt-10 grid grid-cols-3 gap-4 max-w-sm border-t border-[var(--color-border)] pt-6">
+                <Stat label={t('Projects', '项目')} value={projects.length}      active={revealed} delay={0.1} />
+                <Stat label={t('Research', '研究')} value={researchItems.length} active={revealed} delay={0.2} />
+                <Stat label={t('Skills',   '技能')} value={skills.length}        active={revealed} delay={0.3} />
               </div>
             </div>
 
@@ -370,7 +547,7 @@ export default function ProfileContent() {
                   {t('Availability', '状态')}
                 </p>
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-breathe shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-sky-500 animate-breathe shrink-0" />
                   <span className="text-sm font-bold font-mono uppercase tracking-wide">
                     {t(profile.statusLabel.en, profile.statusLabel.zh)}
                   </span>
@@ -381,8 +558,11 @@ export default function ProfileContent() {
 
           {/* ── Right: Active Projects + System Metrics ── */}
           <div
-            className={`lg:col-span-5 bg-[var(--color-bg)]/40 p-8 md:p-10 flex flex-col gap-6 relative transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0'}`}
+            className={`lg:col-span-5 bg-[var(--color-bg)]/40 p-8 md:p-10 2xl:p-12 flex flex-col gap-6 relative transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0'}`}
           >
+            {/* Local terminal clock */}
+            <LocalClock />
+
             {/* Active Projects */}
             <div>
               <h2 className="font-mono text-xs font-bold uppercase tracking-widest border-b border-[var(--color-border)] pb-3 mb-5 flex justify-between items-center">
@@ -424,6 +604,11 @@ export default function ProfileContent() {
                   </button>
                 </Link>
               </div>
+
+              {/* Email uplink */}
+              <div className="mt-3">
+                <EmailButton />
+              </div>
             </div>
 
             {/* System Metrics */}
@@ -456,6 +641,17 @@ export default function ProfileContent() {
 
         </div>
       </motion.div>
+
+      {/* Status ticker */}
+      <div className={`mt-3 transition-opacity duration-700 ${revealed ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="overflow-hidden border-y border-[var(--color-border)] bg-[var(--color-surface)]/40 py-2">
+          <div className="flex whitespace-nowrap animate-marquee">
+            <TickerRow />
+            <TickerRow />
+          </div>
+        </div>
+      </div>
+      </div>
     </div>
   )
 }
