@@ -598,7 +598,7 @@ export default function ProfileContent() {
                     <div className="relative flex items-center justify-center gap-2.5">
                       <Database size={16} className="text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors" />
                       <span className="font-mono text-xs font-bold tracking-widest text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">
-                        {t('ENTER DATABASE', '进入数据库')}
+                        {t('ENTER MATRIX', '进入技能矩阵')}
                       </span>
                     </div>
                   </button>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import DatabaseContent from './DatabaseContent'
 
 export const metadata: Metadata = {
-  title: 'Database — Portfolio',
+  title: 'Skill Matrix — Portfolio',
 }
 
 export default function DatabasePage() {
