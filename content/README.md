@@ -1,6 +1,6 @@
 # 内容编写指南
 
-**projects(项目)** 和 **research(研究)** 两个页面的内容,都从这里的 Markdown 文件自动读取 —— 你只要加 / 改 `.md` 文件,页面就会更新,**不用碰任何代码**。
+**projects(项目)**、**research(研究)** 和 **dev log(开发日志)** 这几个页面的内容,都从这里的 Markdown 文件自动读取 —— 你只要加 / 改 `.md` 文件,页面就会更新,**不用碰任何代码**。
 
 ## 怎么加一条内容
 
@@ -8,6 +8,7 @@
 
 - 项目 → `content/projects/你起的名字.md`
 - 研究 → `content/research/你起的名字.md`
+- 开发日志 → `content/logs/你起的名字.md`
 
 文件名(去掉 `.md`)会成为它的网址 slug。
 
@@ -64,6 +65,18 @@ github: https://github.com/你的用户名/仓库
 | `serial` | | 编号,如 `RS-2024-001` |
 | `order` | | 排序数字 |
 | 正文 | | 摘要 abstract |
+
+### 开发日志 `content/logs/*.md`
+
+| 字段 | 必填 | 说明 |
+|---|---|---|
+| `title` | ✅ | 标题 |
+| `date` | ✅ | 日期,如 `2025-02-20`(也用于排序,新的在前) |
+| `readTime` | | 阅读时长,如 `8 min` |
+| `tags` | ✅ | 标签数组;筛选按 tag 归类:`research/vr/haptics`→研究, `robotics/hardware/ros2`→构建日志, `meta`→杂项 |
+| `status` | | `published` / `draft` / `archived` |
+| `summary` | ✅ | 列表卡片显示的摘要 |
+| 正文 | | 文章正文(Markdown,详情页用 MDX 渲染) |
 
 ## 注意事项
 

@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import LogsContent from './LogsContent'
+import { getLogs } from '@/lib/content'
 
 export const metadata: Metadata = {
-  title: 'System Logs — Portfolio',
+  title: 'Dev Log — Portfolio',
 }
 
 export default function LogsPage() {
-  return <LogsContent />
+  return <LogsContent posts={getLogs()} />
 }

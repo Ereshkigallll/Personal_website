@@ -17,7 +17,7 @@ const navItems = [
   { href: '/research',  icon: FlaskConical,  label: 'RESEARCH'     },
   { href: '/projects',  icon: FolderOpen,    label: 'PROJECTS'     },
   { href: '/database',  icon: Database,      label: 'SKILL MATRIX' },
-  { href: '/logs',      icon: Terminal,      label: 'SYSTEM_LOGS'  },
+  { href: '/logs',      icon: Terminal,      label: 'DEV_LOG'      },
   { href: '/contact',   icon: Send,          label: 'CONTACT'      },
 ]
 

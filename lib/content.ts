@@ -64,3 +64,41 @@ export function getResearch(): Research[] {
     link:     it.link,
   }))
 }
+
+/** Dev-log posts — body is the article (MDX); newest first by date. */
+export function getLogs() {
+  return readMd('logs')
+    .sort((a, b) => String(b.date).localeCompare(String(a.date)))
+    .map((it, i) => ({
+      slug:     it.slug,
+      logId:    it.logId ?? `#LOG-${String(i + 1).padStart(4, '0')}`,
+      title:    it.title ?? it.slug,
+      date:     String(it.date ?? ''),
+      readTime: it.readTime ?? '',
+      tags:     Array.isArray(it.tags) ? it.tags : [],
+      status:   (it.status ?? 'published') as 'published' | 'draft' | 'archived',
+      summary:  it.summary ?? '',
+      body:     it.body || '',
+    }))
+}
+
+/** Single log by slug, with the raw markdown body for MDX rendering. */
+export function getLog(slug: string) {
+  const file = path.join(ROOT, 'logs', `${slug}.md`)
+  if (!fs.existsSync(file)) return null
+  const { data, content } = matter(fs.readFileSync(file, 'utf8'))
+  return {
+    slug,
+    title:    (data.title as string) ?? slug,
+    date:     String(data.date ?? ''),
+    readTime: (data.readTime as string) ?? '',
+    tags:     Array.isArray(data.tags) ? (data.tags as string[]) : [],
+    status:   (data.status as string) ?? 'published',
+    body:     content.trim(),
+  }
+}
+
+/** All log slugs — for generateStaticParams. */
+export function getLogSlugs(): string[] {
+  return readMd('logs').map(it => it.slug)
+}
