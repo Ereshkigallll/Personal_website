@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { useLanguage } from '@/lib/language'
+import PageEntrance from '@/components/layout/PageEntrance'
 
 const skillCategories = [
   {
@@ -83,51 +84,53 @@ export default function DatabaseContent() {
   const { t } = useLanguage()
 
   return (
-    <div className="max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto space-y-6">
+    <PageEntrance page="database" records={skillCategories.map(category => ({ id: category.id, label: t(category.label.en, category.label.zh), meta: String(category.skills.length).padStart(2, '0') }))}>
+      <div className="max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto space-y-6">
 
-      {/* ── Header ── */}
-      <div className="panel-acrylic p-6 md:p-8">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" />
-          <span className="font-mono text-[9px] text-[var(--color-muted)] uppercase tracking-widest">
-            {t('Skills · Tools · Hardware', '技能 · 工具 · 硬件')}
-          </span>
+        {/* ── Header ── */}
+        <div className="panel-acrylic p-6 md:p-8">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" />
+            <span className="font-mono text-[9px] text-[var(--color-muted)] uppercase tracking-widest">
+              {t('Skills · Tools · Hardware', '技能 · 工具 · 硬件')}
+            </span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase">
+            {t('Skill Matrix', '技能矩阵')}
+          </h1>
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase">
-          {t('Skill Matrix', '技能矩阵')}
-        </h1>
+
+        {/* ── Skill columns ── */}
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {skillCategories.map(({ id, label, skills }, colIdx) => (
+            <motion.div key={id} variants={colVariants} className="panel-acrylic p-8 flex flex-col">
+              <div className="flex items-center gap-4 mb-8">
+                <h3 className="font-mono text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--color-muted)] whitespace-nowrap">
+                  {t(label.en, label.zh)}
+                </h3>
+                <div className="flex-1 h-px bg-[var(--color-border)]" />
+              </div>
+
+              <div className="space-y-8">
+                {skills.map(({ name, level }, skillIdx) => (
+                  <SkillRow
+                    key={name}
+                    name={name}
+                    level={level}
+                    delay={colIdx * 0.15 + skillIdx * 0.07 + 0.2}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
       </div>
-
-      {/* ── Skill columns ── */}
-      <motion.div
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {skillCategories.map(({ id, label, skills }, colIdx) => (
-          <motion.div key={id} variants={colVariants} className="panel-acrylic p-8 flex flex-col">
-            <div className="flex items-center gap-4 mb-8">
-              <h3 className="font-mono text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--color-muted)] whitespace-nowrap">
-                {t(label.en, label.zh)}
-              </h3>
-              <div className="flex-1 h-px bg-[var(--color-border)]" />
-            </div>
-
-            <div className="space-y-8">
-              {skills.map(({ name, level }, skillIdx) => (
-                <SkillRow
-                  key={name}
-                  name={name}
-                  level={level}
-                  delay={colIdx * 0.15 + skillIdx * 0.07 + 0.2}
-                />
-              ))}
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-
-    </div>
+    </PageEntrance>
   )
 }

@@ -76,7 +76,7 @@ export default function SideNav() {
 
               {/* Tooltip */}
               <span className="
-                pointer-events-none absolute left-full ml-3 px-2 py-1
+                pointer-events-none hidden sm:block absolute left-full ml-3 px-2 py-1
                 bg-[var(--color-text)] text-[var(--color-bg)]
                 font-mono text-[9px] font-bold tracking-widest whitespace-nowrap rounded
                 opacity-0 group-hover:opacity-100 transition-opacity

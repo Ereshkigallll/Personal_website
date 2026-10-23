@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion'
 import Link from 'next/link'
 import { Database, ArrowRight, Mail, ArrowUpRight } from 'lucide-react'
@@ -9,14 +9,13 @@ import { projects } from '@/content/projects'
 import { researchItems } from '@/content/research'
 import { skills } from '@/content/skills'
 import { useLanguage } from '@/lib/language'
-import { useBootDone } from '@/lib/boot-context'
+import { usePageEntry } from '@/lib/page-entry'
 import { useExperienceEntry } from '@/components/layout/ExperienceEntry'
 import styles from './profile.module.css'
 
 /* ── Types & constants ─────────────────────────────────────────────── */
 type Phase = 'expanding' | 'decrypting' | 'complete' | 'revealed'
 const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%<>[]|#*'
-const SESSION_KEY    = 'profile-intro-played'
 
 /* ── useScramble ────────────────────────────────────────────────────── */
 function useScramble(target: string, active: boolean, startDelay = 0): string {
@@ -265,41 +264,29 @@ function GeometricAvatar() {
 /* ── Profile Page ──────────────────────────────────────────────────── */
 export default function ProfileContent() {
   const { t } = useLanguage()
-  const { bootDone } = useBootDone()
+  const { mode, played, finish } = usePageEntry('profile')
   const { sourceRef, departing } = useExperienceEntry()
 
   /* ── Animation phase state ── */
   const [phase, setPhase]       = useState<Phase>('expanding')
-  const [skipAnim, setSkipAnim] = useState(false)
-  const [ready, setReady]       = useState(false) // true only after boot screen finishes
-
-  // If bootDone is false at mount → boot screen is playing → we must wait & always animate
-  // If bootDone is true  at mount → SPA navigation back → may skip if already seen
-  const bootScreenWasShown = useRef(!bootDone)
+  const skipAnim = mode === 'complete' && !played
+  const ready = mode !== 'pending'
 
   useEffect(() => {
-    // SPA navigation back to profile (no boot screen) + already seen → skip animation
-    if (!bootScreenWasShown.current && sessionStorage.getItem(SESSION_KEY) === '1') {
-      setSkipAnim(true)
+    if (mode === 'complete') {
       setPhase('revealed')
-      setReady(true)
       return
     }
-
-    // Wait for boot screen to fully finish before starting card animation
-    if (!bootDone) return
-
-    // Boot screen just finished → always play the decrypt animation
-    setReady(true)
+    if (mode !== 'play') return
     const t1 = setTimeout(() => setPhase('decrypting'), 600)
     const t2 = setTimeout(() => setPhase('complete'),   2400)
     const t3 = setTimeout(() => {
       setPhase('revealed')
-      sessionStorage.setItem(SESSION_KEY, '1')
+      finish()
     }, 3100)
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
-  }, [bootDone])
+  }, [mode, finish])
 
   /* ── Scramble hooks (only active during decrypting) ── */
   const isDecrypting    = phase === 'decrypting'
@@ -319,14 +306,14 @@ export default function ProfileContent() {
     }
   }, [phase, pct])
 
-  const revealed = phase === 'revealed'
+  const revealed = mode === 'complete'
 
   /* Bio typewriter — types out once the card is revealed */
   const bioText = t(profile.bio.en, profile.bio.zh)
   const { shown: bioShown, done: bioDone } = useTypewriter(bioText, revealed && !skipAnim, 24, 450)
 
   return (
-    <motion.div className={styles.page} animate={{ opacity: departing ? 0 : 1, y: departing ? -6 : 0 }} transition={{ duration: .2 }}>
+    <motion.div className={styles.page} data-page-entry="profile" data-entry={mode} aria-busy={mode !== 'complete'} animate={{ opacity: departing ? 0 : 1, y: departing ? -6 : 0 }} transition={{ duration: .2 }}>
       <div className={styles.shell}>
       <motion.div
         style={{ transformOrigin: 'center center' }}

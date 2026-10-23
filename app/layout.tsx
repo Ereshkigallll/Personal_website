@@ -7,6 +7,7 @@ import BootScreen from '@/components/layout/BootScreen'
 import { LanguageProvider } from '@/lib/language'
 import { BootProvider } from '@/lib/boot-context'
 import { ExperienceEntryProvider } from '@/components/layout/ExperienceEntry'
+import { PageEntryProvider } from '@/lib/page-entry'
 
 export const metadata: Metadata = {
   title: 'Portfolio — HR Department',
@@ -31,24 +32,26 @@ export default function RootLayout({
       <body>
         <BootProvider>
           <LanguageProvider>
-            <ExperienceEntryProvider>
-              <BootScreen />
-              <GridBackground />
-              <SideNav />
-              <TopBar />
+            <PageEntryProvider>
+              <ExperienceEntryProvider>
+                <BootScreen />
+                <GridBackground />
+                <SideNav />
+                <TopBar />
 
-              <div
-                className="relative z-10 h-screen flex flex-col"
-                style={{ marginLeft: 'var(--sidebar-width)' }}
-              >
-                <main
-                  className="flex-1 overflow-y-auto px-4 sm:px-8 pb-8"
-                  style={{ paddingTop: 'calc(var(--topbar-height) + 1.5rem)' }}
+                <div
+                  className="relative z-10 h-screen flex flex-col"
+                  style={{ marginLeft: 'var(--sidebar-width)' }}
                 >
-                  {children}
-                </main>
-              </div>
-            </ExperienceEntryProvider>
+                  <main
+                    className="flex-1 overflow-y-auto px-4 sm:px-8 pb-8"
+                    style={{ paddingTop: 'calc(var(--topbar-height) + 1.5rem)' }}
+                  >
+                    {children}
+                  </main>
+                </div>
+              </ExperienceEntryProvider>
+            </PageEntryProvider>
           </LanguageProvider>
         </BootProvider>
       </body>

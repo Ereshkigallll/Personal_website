@@ -1,0 +1,140 @@
+.overlay {
+  position: fixed;
+  z-index: 35;
+  inset: var(--topbar-height) 0 0 var(--sidebar-width);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  padding: 24px;
+  overflow: auto;
+  background: color-mix(in srgb, var(--color-bg) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.panel { width: 100%; max-width: 560px; min-width: 0; justify-self: center; font-family: var(--font-mono); }
+.eyebrow { display: flex; align-items: center; gap: 10px; color: var(--color-muted); font-size: 11px; letter-spacing: .12em; }
+.eyebrow > span:first-child { width: 6px; height: 6px; background: var(--color-accent); }
+.eyebrow b { margin-left: auto; color: var(--color-muted); font-size: 10px; font-weight: 400; }
+.panel h2 { margin-top: 16px; font-family: var(--font-sans); font-size: clamp(24px, 2.5vw, 36px); line-height: 1.2; letter-spacing: -.035em; font-weight: 600; }
+.command { display: flex; align-items: center; gap: 9px; margin: 14px 0 28px; font-size: clamp(10px, 1vw, 13px); color: var(--color-muted); }
+.command > span { color: var(--color-text); }
+.command i, .logLines p i { width: 6px; height: 12px; background: var(--color-accent); animation: blink .65s steps(1) infinite; }
+.footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; font-size: 12px; color: var(--color-muted); }
+.footer > span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.progress { height: 2px; background: var(--color-border); margin-top: 12px; overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--color-accent); transform-origin: left; animation: progress 2.2s cubic-bezier(.22, 1, .36, 1) both; }
+.skip { display: flex; align-items: center; gap: 12px; min-height: 40px; margin: 12px 0 0 auto; padding: 0 4px; color: var(--color-muted); font-size: 11px; transition: color .2s; }
+.skip span { opacity: .55; font-size: 10px; }
+.skip:hover { color: var(--color-text); }
+.skip:focus-visible { outline: 1px solid var(--color-text); outline-offset: 4px; }
+
+/* Research: reference sheets spread out, then actual archive entries resolve. */
+.research { border-top: 1px solid var(--color-border); }
+.paperStack { height: 156px; position: relative; overflow: hidden; }
+.paper { position: absolute; left: calc(50% - 49px); top: 21px; width: 98px; height: 116px; padding: 12px; border: 1px solid var(--color-border); background: var(--color-surface); transform-origin: bottom center; animation: papers .8s calc(var(--index) * .13s) cubic-bezier(.22, 1, .36, 1) both; }
+.paper span { font-size: 8px; letter-spacing: .1em; color: var(--color-muted); }
+.paper i { display: block; width: 100%; height: 2px; margin-top: 9px; background: var(--color-border); }
+.paper i:nth-of-type(2) { width: 70%; }
+.paper b { display: block; color: var(--color-accent-dim); font-size: 11px; margin-top: 12px; }
+.archiveScan { position: absolute; top: 0; bottom: 0; width: 1px; left: 10%; box-shadow: 0 0 16px var(--color-accent); background: var(--color-accent); animation: scan 1.15s .35s both; }
+.indexRows { border: 1px solid var(--color-border); background: color-mix(in srgb, var(--color-surface) 55%, transparent); }
+.indexRows > div { display: flex; gap: 16px; align-items: center; min-height: 40px; padding: 10px 14px; font-size: 11px; border-bottom: 1px solid var(--color-border); animation: rowIn .4s calc(.65s + var(--index) * .2s) both; }
+.indexRows > div:last-child { border-bottom: 0; }
+.indexRows span { flex-shrink: 0; color: var(--color-muted); font-size: 10px; }
+.indexRows strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 500; }
+.indexRows b { margin-left: auto; color: var(--color-accent-dim); }
+.indexRows p { padding: 14px; font-size: 12px; color: var(--color-muted); }
+
+/* Projects: independent modules converge on a shared workspace. */
+.moduleDiagram { height: 175px; position: relative; }
+.moduleDiagram svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.moduleDiagram path { stroke: var(--color-border); stroke-dasharray: 4 5; }
+.module { position: absolute; padding: 9px 10px; font-size: 9px; letter-spacing: .06em; border: 1px solid var(--color-border); background: var(--color-surface); display: flex; gap: 8px; align-items: center; animation: moduleIn .8s calc(var(--index) * .12s) cubic-bezier(.22, 1, .36, 1) both; }
+.module i { width: 5px; height: 5px; background: var(--color-accent); }
+.module:nth-of-type(1) { left: 4%; top: 70px; --x: -38px; --y: 0px; }
+.module:nth-of-type(2) { right: 4%; top: 70px; --x: 38px; --y: 0px; }
+.module:nth-of-type(3) { left: 50%; top: 0; margin-left: -41px; --x: 0px; --y: -24px; }
+.module:nth-of-type(4) { left: 50%; bottom: 0; margin-left: -41px; --x: 0px; --y: 24px; }
+.moduleCore { width: 64px; height: 64px; border: 1px solid var(--color-accent); position: absolute; left: calc(50% - 32px); top: 55px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 16px 12px; animation: coreIn .55s .7s both; }
+.moduleCore span { background: var(--color-accent); }
+.moduleCore span:nth-child(2) { transform: translateY(-7px); }
+.projectLabels { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
+.projectLabels span { padding: 7px 10px; border: 1px solid var(--color-border); font-size: 10px; color: var(--color-muted); max-width: 33%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; animation: rowIn .35s calc(.95s + var(--index) * .12s) both; }
+
+/* Skills: scan across the capability grid, then resolve its group labels. */
+.matrix { border: 1px solid var(--color-border); padding: 24px; }
+.matrixGrid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 7px; position: relative; overflow: hidden; }
+.matrixGrid > i { height: 25px; border: 1px solid var(--color-border); background: color-mix(in srgb, var(--color-accent) calc(var(--level) * 55%), transparent); animation: cellIn .35s calc(var(--index) * .032s) both; }
+.matrixSweep { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--color-accent); box-shadow: 0 0 20px var(--color-accent); animation: scan 1.25s .2s both; }
+.matrixLabels { display: flex; justify-content: space-between; gap: 16px; margin-top: 22px; }
+.matrixLabels > div { display: flex; flex-direction: column; gap: 7px; min-width: 0; font-size: 10px; color: var(--color-muted); animation: rowIn .4s calc(.8s + var(--index) * .12s) both; }
+.matrixLabels strong { font-size: 17px; color: var(--color-text); font-weight: 500; }
+
+/* Logs: a terminal writes actual entries in archive order. */
+.console { border: 1px solid var(--color-border); background: color-mix(in srgb, var(--color-surface) 60%, transparent); }
+.consoleHeader { display: flex; align-items: center; gap: 6px; padding: 12px 16px; border-bottom: 1px solid var(--color-border); }
+.consoleHeader i { width: 5px; height: 5px; border: 1px solid var(--color-muted); opacity: .5; }
+.consoleHeader i:first-child { background: var(--color-accent); border-color: var(--color-accent); opacity: 1; }
+.consoleHeader span { margin-left: auto; color: var(--color-muted); font-size: 10px; }
+.logLines { padding: 20px 16px 12px; min-height: 166px; }
+.logLines > div { display: flex; gap: 10px; margin-bottom: 15px; font-size: 11px; animation: logIn .35s calc(.3s + var(--index, 0) * .35s) both; }
+.logLines > div > span { color: var(--color-muted); white-space: nowrap; font-size: 10px; }
+.logLines b { color: var(--color-accent-dim); }
+.logLines strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.logLines p { display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--color-muted); }
+.logLines p > span { color: var(--color-accent-dim); }
+
+/* Contact: a signal travels between the two endpoints and returns. */
+.relay svg { display: block; width: 100%; height: auto; }
+.relay svg rect { stroke: var(--color-text); stroke-width: 1; }
+.relay svg .relayCore { fill: var(--color-accent); stroke: none; animation: coreIn .5s .2s both; }
+.relay svg text { fill: var(--color-muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; }
+.relayGuide { stroke: var(--color-border); stroke-dasharray: 3 5; }
+.relaySignal, .relayReply { stroke: var(--color-accent); stroke-width: 2; stroke-dasharray: 270; stroke-dashoffset: 270; animation: signal .8s .3s ease both; }
+.relayReply { stroke-width: 1; animation-delay: 1s; }
+.relayChannels { display: flex; justify-content: center; gap: 24px; color: var(--color-muted); font-size: 10px; letter-spacing: .08em; }
+.relayChannels span { animation: rowIn .4s 1.2s both; }
+
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes papers { from { opacity: 0; transform: translateY(16px) rotate(0deg); } to { opacity: 1; transform: translateX(calc((var(--index) - 1) * 64px)) rotate(calc((var(--index) - 1) * 8deg)); } }
+@keyframes scan { 0% { left: 0; opacity: 0; } 15%, 75% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+@keyframes rowIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes moduleIn { from { opacity: 0; transform: translate(var(--x), var(--y)); } to { opacity: 1; transform: translate(0, 0); } }
+@keyframes coreIn { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
+@keyframes cellIn { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: scale(1); } }
+@keyframes logIn { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0); } }
+@keyframes signal { to { stroke-dashoffset: 0; } }
+
+@media (max-width: 640px) {
+  .overlay { padding: 20px; }
+  .eyebrow { font-size: 9px; letter-spacing: .05em; }
+  .panel h2 { font-size: 25px; }
+  .command { gap: 6px; font-size: 10px; margin-bottom: 20px; }
+  .indexRows > div { gap: 8px; padding: 10px; }
+  .indexRows span { font-size: 8px; }
+  .module { font-size: 8px; padding: 7px; gap: 5px; }
+  .moduleCore { width: 44px; height: 44px; top: 65px; left: calc(50% - 22px); padding: 12px 8px; gap: 3px; }
+  .module:nth-of-type(1) { left: 0; }
+  .module:nth-of-type(2) { right: 0; }
+  .matrix { padding: 14px; }
+  .matrixGrid { gap: 4px; }
+  .matrixGrid > i { height: 20px; }
+  .matrixLabels { gap: 10px; }
+  .matrixLabels > div { font-size: 9px; }
+  .consoleHeader, .logLines { padding-left: 12px; padding-right: 12px; }
+  .logLines > div { flex-wrap: wrap; gap: 6px; }
+  .logLines strong { width: 100%; }
+}
+
+@media (max-height: 620px) {
+  .overlay { place-items: start center; }
+  .panel { margin: 8px 0; }
+  .command { margin-bottom: 12px; }
+  .paperStack { height: 136px; }
+  .footer { margin-top: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay *, .overlay *::before, .overlay *::after { animation: none !important; transition: none !important; }
+}

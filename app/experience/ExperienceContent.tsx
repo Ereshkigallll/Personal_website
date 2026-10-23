@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { AlignLeft, GitCommitHorizontal } from 'lucide-react'
 import type { Experience } from '@/content/experience'
 import { useLanguage } from '@/lib/language'
+import { useBootDone } from '@/lib/boot-context'
 import { useExperienceEntry } from '@/components/layout/ExperienceEntry'
 import ExperienceList from './ExperienceList'
 import ExperienceTimeline from './ExperienceTimeline'
@@ -16,6 +17,7 @@ const STORAGE_KEY = 'experience-archive'
 
 export default function ExperienceContent({ items, asOfDate }: { items: Experience[]; asOfDate: string }) {
   const { t } = useLanguage()
+  const { bootDone } = useBootDone()
   const reduceMotion = useReducedMotion()
   const { claimIntro, finishEntry } = useExperienceEntry()
   const [introMode, setIntroMode] = useState<TimelineIntroMode>('pending')
@@ -29,16 +31,15 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
   const currentCount = items.filter(item => item.endDate === null).length
 
   useEffect(() => {
-    if (didRestore.current) return
+    if (!bootDone || didRestore.current) return
     didRestore.current = true
     document.querySelector('main')?.scrollTo({ top: 0 })
     const query = new URLSearchParams(window.location.search)
     const returningToRecord = query.has('focus')
-    let preferredView: ExperienceView = query.get('view') === 'list' ? 'list' : 'timeline'
+    const explicitListView = query.get('view') === 'list'
     try {
       const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '{}')
       const nextView = query.get('view') ?? saved.view
-      preferredView = nextView === 'list' ? 'list' : 'timeline'
       const latest = items.find(item => saved.filter === 'all' || item.category === saved.filter) ?? items[0]
       const nextFocus = query.get('focus') ?? (saved.order === 'newest-first' ? saved.focusId : latest?.id)
       if (nextView === 'list' && query.has('focus')) listReturnFocus.current = nextFocus
@@ -56,7 +57,7 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
         window.history.replaceState(window.history.state, '', `${window.location.pathname}${remaining ? `?${remaining}` : ''}`)
       }
     } catch { /* Storage may be unavailable in a private browsing context. */ }
-    const playIntro = claimIntro(!returningToRecord && preferredView === 'timeline')
+    const playIntro = claimIntro(!returningToRecord && !explicitListView)
     if (playIntro) {
       setView('timeline')
       setActiveFilter('all')
@@ -64,7 +65,7 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
     } else finishEntry()
     setIntroMode(playIntro ? 'play' : 'complete')
     setRestored(true)
-  }, [items, claimIntro, finishEntry])
+  }, [bootDone, items, claimIntro, finishEntry])
 
   const finishIntro = useCallback(() => {
     setIntroMode('complete')
@@ -77,7 +78,7 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
   }, [view, focusId, activeFilter, restored])
 
   return (
-    <div className={`${styles.page} ${view === 'timeline' ? styles.timelinePage : 'max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto'}`} data-entry={introMode}>
+    <div className={`${styles.page} ${view === 'timeline' ? styles.timelinePage : 'max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto'}`} data-page-entry="experience" data-entry={introMode}>
       <header className={styles.header}>
         <div>
           <p className={styles.eyebrow}><span />{t('Professional & Academic Record', '工作与学术履历')}</p>

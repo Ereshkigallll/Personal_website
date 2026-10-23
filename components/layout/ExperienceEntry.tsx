@@ -3,8 +3,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type RefObject } from 'react'
 import { motion } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEntryRegistry } from '@/lib/page-entry'
 
-const STORAGE_KEY = 'experience-entry-played-v1'
 type Point = { x: number; y: number }
 type Bridge = { origin: Point & { width: number; height: number }; contracted: boolean; target?: Point }
 
@@ -24,7 +24,7 @@ export function ExperienceEntryProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const sourceRef = useRef<HTMLDivElement>(null)
-  const seenRef = useRef(false)
+  const { hasEntered, claimFirstEntry } = useEntryRegistry()
   const pathRef = useRef(pathname)
   const bridgeRef = useRef<Bridge | null>(null)
   const [bridge, setBridge] = useState<Bridge | null>(null)
@@ -35,9 +35,7 @@ export function ExperienceEntryProvider({ children }: { children: ReactNode }) {
     setBridge(next)
   }, [])
 
-  const hasPlayed = useCallback(() => {
-    try { return seenRef.current || sessionStorage.getItem(STORAGE_KEY) === '1' } catch { return seenRef.current }
-  }, [])
+  const hasPlayed = useCallback(() => hasEntered('experience'), [hasEntered])
 
   const finishEntry = useCallback(() => {
     updateBridge(null)
@@ -45,11 +43,9 @@ export function ExperienceEntryProvider({ children }: { children: ReactNode }) {
   }, [updateBridge])
 
   const claimIntro = useCallback((allowed: boolean) => {
-    const play = allowed && !hasPlayed() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    seenRef.current = true
-    try { sessionStorage.setItem(STORAGE_KEY, '1') } catch { /* Keep the once-per-visit rule in memory. */ }
-    return play
-  }, [hasPlayed])
+    const firstEntry = claimFirstEntry('experience')
+    return allowed && firstEntry && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  }, [claimFirstEntry])
 
   const enterFromProfile = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
     if (pathname !== '/profile' || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || hasPlayed() || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
