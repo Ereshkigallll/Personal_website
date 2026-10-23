@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { useLanguage } from '@/lib/language'
 import PageEntrance from '@/components/layout/PageEntrance'
+import PageLayout from '@/components/layout/PageLayout'
+import styles from '@/components/layout/page-layout.module.css'
 
 const skillCategories = [
   {
@@ -52,13 +54,13 @@ function SkillRow({ name, level, delay }: { name: string; level: number; delay: 
 
   return (
     <div>
-      <div className="flex justify-between items-end mb-2">
-        <span className="font-mono font-bold text-sm">{name}</span>
-        <motion.span className="font-mono text-[10px] font-bold text-[var(--color-accent)]">
+      <div className={styles.skillLabel}>
+        <span className="font-mono font-bold text-[1em]">{name}</span>
+        <motion.span className="font-mono text-[0.875em] font-bold text-[var(--color-accent)]">
           {displayCount}
         </motion.span>
       </div>
-      <div className="h-[2px] w-full bg-[var(--color-border)] relative overflow-hidden">
+      <div className="h-[3px] w-full bg-[var(--color-border)] relative overflow-hidden">
         <motion.div
           className="absolute top-0 left-0 h-full bg-[var(--color-text)] dark:bg-[var(--color-accent)]"
           initial={{ width: '0%' }}
@@ -85,38 +87,38 @@ export default function DatabaseContent() {
 
   return (
     <PageEntrance page="database" records={skillCategories.map(category => ({ id: category.id, label: t(category.label.en, category.label.zh), meta: String(category.skills.length).padStart(2, '0') }))}>
-      <div className="max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto space-y-6">
+      <PageLayout>
 
         {/* ── Header ── */}
-        <div className="panel-acrylic p-6 md:p-8">
+        <div className={`panel-acrylic ${styles.panelPadding}`}>
           <div className="flex items-center gap-2 mb-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" />
-            <span className="font-mono text-[9px] text-[var(--color-muted)] uppercase tracking-widest">
+            <span className="font-mono text-[0.75em] text-[var(--color-muted)] uppercase tracking-widest">
               {t('Skills · Tools · Hardware', '技能 · 工具 · 硬件')}
             </span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase">
+          <h1 className={`${styles.title} font-bold tracking-tighter uppercase`}>
             {t('Skill Matrix', '技能矩阵')}
           </h1>
         </div>
 
         {/* ── Skill columns ── */}
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+          className={styles.skillGrid}
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {skillCategories.map(({ id, label, skills }, colIdx) => (
-            <motion.div key={id} variants={colVariants} className="panel-acrylic p-8 flex flex-col">
+            <motion.div key={id} variants={colVariants} className={`panel-acrylic flex flex-col ${styles.skillPanel}`}>
               <div className="flex items-center gap-4 mb-8">
-                <h3 className="font-mono text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--color-muted)] whitespace-nowrap">
+                <h3 className={`${styles.skillHeading} font-mono font-bold uppercase text-[var(--color-muted)]`}>
                   {t(label.en, label.zh)}
                 </h3>
                 <div className="flex-1 h-px bg-[var(--color-border)]" />
               </div>
 
-              <div className="space-y-8">
+              <div className={styles.skillRows}>
                 {skills.map(({ name, level }, skillIdx) => (
                   <SkillRow
                     key={name}
@@ -130,7 +132,7 @@ export default function DatabaseContent() {
           ))}
         </motion.div>
 
-      </div>
+      </PageLayout>
     </PageEntrance>
   )
 }

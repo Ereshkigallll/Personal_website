@@ -1,0 +1,104 @@
+.shell {
+  width: 100%;
+  max-width: 112rem;
+  min-width: 0;
+  margin-inline: auto;
+  container-type: inline-size;
+}
+
+/* Match Contact's reading scale across the content sections. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 1.5cqw, 28px);
+  min-width: 0;
+  font-size: clamp(1rem, calc(.75rem + .4cqw), 1.25rem);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.header, .panelPadding, .record { padding: clamp(24px, 2.2cqw, 40px); }
+.header { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.header > div { min-width: 0; }
+.title { font-size: clamp(2.25rem, 3.7cqw, 4rem); line-height: 1.1; }
+.version { font-size: clamp(12px, .85cqw, 16px); letter-spacing: .03em; }
+.headerStats { display: flex; flex-wrap: wrap; gap: 16px 24px; width: min(100%, 20rem); flex-shrink: 0; }
+.headerStats > div { flex: 1 1 60px; min-width: 0; text-align: center; }
+.statValue { font-size: 1.8em; line-height: 1.2; }
+.statLabel { font-size: .75em; margin-top: 5px; }
+.bodyText { font-size: 1em; max-width: 88ch; line-height: 1.7; }
+.cardTitle { font-size: clamp(1.25em, 1.9cqw, 1.65em); line-height: 1.25; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filterButton { min-height: 40px; padding: 8px 14px; font-size: .8em; }
+.recordList { display: flex; flex-direction: column; gap: clamp(20px, 1.5cqw, 28px); }
+.record { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.recordMeta { display: flex; flex-direction: column; gap: 0; min-width: 0; padding-bottom: 20px; border-bottom: 1px solid var(--color-border); }
+.recordNumber { font-size: 3em; }
+.recordContent { min-width: 0; }
+.cardFooter { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 20px; }
+.cardFooter > div { min-width: 0; }
+.action { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 16px; min-height: 44px; }
+.authorGroup { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.authorNames { flex: 0 1 auto; min-width: 0; max-width: 100%; font-size: .8em; }
+.avatar { width: 2em; height: 2em; }
+.avatar span { font-size: .75em; }
+.footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 24px; border-top: 1px solid var(--color-border); }
+.footer > div { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; min-width: 0; }
+
+.skillGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: clamp(20px, 1.5cqw, 28px); }
+.skillPanel { min-width: 0; padding: clamp(24px, 2cqw, 36px); }
+.skillHeading { font-size: .875em; letter-spacing: .12em; }
+.skillRows { display: flex; flex-direction: column; gap: clamp(26px, 2cqw, 36px); }
+.skillLabel { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.skillLabel > span:first-child { min-width: 0; }
+.skillLabel > span:last-child { flex-shrink: 0; }
+
+.logLayout { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(20px, 1.5cqw, 28px); }
+.logSidebar { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.logSidePanel { min-width: 0; padding: clamp(20px, 1.6cqw, 30px); }
+.loadBar { width: clamp(48px, 6cqw, 80px); }
+.logArticles { display: flex; flex-direction: column; gap: clamp(20px, 1.5cqw, 28px); min-width: 0; }
+.logHeading { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--color-border); }
+.logIdentity { display: flex; align-items: flex-start; gap: 16px; flex: 1 1 22em; min-width: 0; }
+.logIdentity > div:last-child { min-width: 0; }
+.logNumber { width: 2.5em; height: 2.5em; }
+.logMeta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 10px; }
+.logMeta > span, .logMeta > time { font-size: .75em; }
+.logBadge { font-size: .75em; align-self: flex-start; }
+.logSummary { font-size: 1em; line-height: 1.7; max-width: 88ch; }
+.logActions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.readLink { display: inline-flex; align-items: center; min-height: 44px; font-size: .8em; }
+
+.detail { width: min(100%, 64rem); margin-inline: auto; }
+.detailCard { padding: clamp(24px, 3cqw, 56px); }
+.detailTitle { font-size: clamp(1.75em, 3cqw, 2.6em); line-height: 1.2; }
+.breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .8em; }
+.articleBody { line-height: 1.8; margin-top: 28px; }
+.articleBody h1 { font-size: 1.6em; }
+.articleBody h2 { font-size: 1.35em; }
+.articleBody h3 { font-size: 1.1em; }
+.articleBody p, .articleBody ul, .articleBody ol, .articleBody blockquote { font-size: 1em; line-height: 1.8; }
+.articleBody code { font-size: .875em; overflow-wrap: anywhere; }
+.articleBody pre { font-size: .875em; max-width: 100%; overflow-x: auto; }
+.articleBody pre code { font-size: 1em; white-space: pre; overflow-wrap: normal; padding: 0; border: 0; background: none; }
+
+@container (min-width: 900px) {
+  .record { grid-template-columns: clamp(180px, 15cqw, 240px) minmax(0, 1fr); gap: clamp(24px, 2cqw, 40px); }
+  .recordMeta { padding-bottom: 0; padding-right: clamp(20px, 1.5cqw, 28px); border-bottom: 0; border-right: 1px solid var(--color-border); }
+}
+
+@container (min-width: 1000px) {
+  .header { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+  .logLayout { grid-template-columns: minmax(260px, .85fr) minmax(0, 3fr); }
+}
+
+@container (max-width: 600px) {
+  .header, .panelPadding, .record, .detailCard { padding: 24px 20px; }
+  .headerStats { gap: 16px 12px; }
+}
+
+@container (max-width: 320px) {
+  .header, .panelPadding, .record, .skillPanel, .logSidePanel, .detailCard { padding: 20px 16px; }
+  .title { font-size: 2rem; }
+  .logIdentity { flex-wrap: wrap; }
+}
