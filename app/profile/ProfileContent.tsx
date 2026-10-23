@@ -10,6 +10,7 @@ import { researchItems } from '@/content/research'
 import { skills } from '@/content/skills'
 import { useLanguage } from '@/lib/language'
 import { useBootDone } from '@/lib/boot-context'
+import { useExperienceEntry } from '@/components/layout/ExperienceEntry'
 import styles from './profile.module.css'
 
 /* ── Types & constants ─────────────────────────────────────────────── */
@@ -265,6 +266,7 @@ function GeometricAvatar() {
 export default function ProfileContent() {
   const { t } = useLanguage()
   const { bootDone } = useBootDone()
+  const { sourceRef, departing } = useExperienceEntry()
 
   /* ── Animation phase state ── */
   const [phase, setPhase]       = useState<Phase>('expanding')
@@ -324,7 +326,7 @@ export default function ProfileContent() {
   const { shown: bioShown, done: bioDone } = useTypewriter(bioText, revealed && !skipAnim, 24, 450)
 
   return (
-    <div className={styles.page}>
+    <motion.div className={styles.page} animate={{ opacity: departing ? 0 : 1, y: departing ? -6 : 0 }} transition={{ duration: .2 }}>
       <div className={styles.shell}>
       <motion.div
         style={{ transformOrigin: 'center center' }}
@@ -480,7 +482,7 @@ export default function ProfileContent() {
                 {profile.name}
               </h1>
               {/* Accent underline */}
-              <div className="h-1 w-24 bg-[var(--color-accent)] mb-6" />
+              <div ref={sourceRef} data-entry-source-ready={revealed} className="h-1 w-24 bg-[var(--color-accent)] mb-6" />
 
               {/* Department */}
               <div className="space-y-1 mb-6">
@@ -642,6 +644,6 @@ export default function ProfileContent() {
         </div>
       </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

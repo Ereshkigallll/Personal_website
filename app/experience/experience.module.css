@@ -114,6 +114,53 @@
 .footer p > span { height: 5px; width: 5px; background: var(--color-accent); }
 .footer strong { color: var(--color-text); }
 
+/* First visit: build the existing timeline in place, then hand over to scrolling. */
+.page[data-entry="play"] .header, .page[data-entry="play"] .toolbar { animation: entryChrome .35s ease-out both; }
+.datePlaceholder { display: none; }
+.entryHud { position: absolute; top: calc(var(--axis-y) + 68 * var(--timeline-unit)); left: 50%; width: max-content; max-width: calc(100% - 32px); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 13px; pointer-events: none; }
+.entryStatus { display: flex; align-items: center; gap: 10px; font: 700 calc(12 * var(--timeline-unit)) var(--font-mono); letter-spacing: .09em; color: var(--color-text); }
+.entryStatus > i { width: 5px; height: 5px; background: var(--color-accent); box-shadow: 0 0 10px var(--color-accent); }
+.entryCounter { display: flex; align-items: center; gap: 12px; font: calc(11 * var(--timeline-unit)) var(--font-mono); color: var(--color-muted); }
+.entryCounter > i { width: 1px; height: 12px; background: var(--color-border); }
+.entrySweep { display: none; position: absolute; top: var(--axis-y); left: 0; right: 0; height: 1px; overflow: hidden; pointer-events: none; mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent); }
+.entrySweep > i { display: block; position: absolute; width: 15%; height: 1px; background: linear-gradient(to right, transparent, var(--color-accent), transparent); }
+.timeline[data-intro-stage="waiting"] .rail, .timeline[data-intro-stage="waiting"] .centerMarker, .timeline[data-intro-stage="waiting"] .timelineReadout, .timeline[data-intro-stage="waiting"] .timelineBottom, .timeline[data-intro-stage="waiting"] .timelineInstructions { visibility: hidden; }
+.timeline[data-intro-active="true"] .axis { animation: entryAxis .48s cubic-bezier(.22,1,.36,1) both; }
+.timeline[data-intro-active="true"] .tick > span { transform-origin: top; animation: entryTick .26s var(--entry-delay) ease-out both; }
+.timeline[data-intro-active="true"] .tick time { animation: entryDate .28s var(--entry-delay) ease-out both; }
+.timeline[data-intro-active="true"] .datePlaceholder { display: block; position: absolute; top: 23px; transform: translateX(-50%); white-space: nowrap; font: calc(12 * var(--timeline-unit)) var(--font-mono); color: var(--color-muted); animation: entryPlaceholder .12s calc(var(--entry-delay) - .02s) both; }
+.timeline[data-intro-active="true"] .period { animation: entryPeriod .48s var(--entry-period-delay) cubic-bezier(.22,1,.36,1) both; }
+.timeline[data-intro-active="true"] .eventLink { transform-origin: bottom center; animation: entryCard .48s 1.26s cubic-bezier(.22,1,.36,1) both; }
+.timeline[data-intro-active="true"] .event[data-focused="true"] .eventLink { animation-delay: 1.13s; }
+.timeline[data-intro-active="true"] .groupStem, .timeline[data-intro-active="true"] .groupCount { animation: entryFade .28s 1.1s both; }
+.timeline[data-intro-active="true"] .centerMarker > span { animation: entryLock .7s 1.05s ease-out both; }
+.timeline[data-intro-active="true"] .timelineReadout { animation: entryFade .25s 1.57s both; }
+.timeline[data-intro-active="true"] .timelineBottom, .timeline[data-intro-active="true"] .timelineInstructions { animation: entryFade .3s 1.48s both; }
+.timeline[data-intro-active="true"] .entryHud { animation: entryHudExit .22s 1.4s both; }
+.timeline[data-intro-active="true"] .entrySweep { display: block; }
+.timeline[data-intro-active="true"] .entrySweep > i { animation: entryScan .92s .35s ease-in-out both; }
+
+@keyframes entryChrome { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes entryAxis {
+  from { clip-path: inset(0 calc(100% - var(--entry-axis-center)) 0 var(--entry-axis-center)); }
+  to { clip-path: inset(0 calc(100% - var(--entry-axis-center) - var(--half-width)) 0 calc(var(--entry-axis-center) - var(--half-width))); }
+}
+@keyframes entryTick { from { opacity: 0; transform: scaleY(0); } to { opacity: 1; transform: scaleY(1); } }
+@keyframes entryDate { from { opacity: 0; margin-top: 5px; filter: blur(2px); } to { opacity: 1; margin-top: 0; filter: blur(0); } }
+@keyframes entryPlaceholder { from { opacity: .45; } to { opacity: 0; } }
+@keyframes entryPeriod { from { opacity: 0; clip-path: inset(-5px 100% -5px 0); } to { opacity: 1; clip-path: inset(-5px 0 -5px 0); } }
+@keyframes entryCard { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes entryFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes entryLock { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.45); box-shadow: 0 0 0 13px color-mix(in srgb, var(--color-accent) 18%, transparent); } }
+@keyframes entryHudExit { from { opacity: 1; } to { opacity: 0; } }
+@keyframes entryScan { 0% { left: -15%; opacity: 0; } 15%, 75% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+
+@media (max-height: 850px) {
+  .entryHud { top: 17px; flex-direction: row; gap: 20px; }
+  .timeline:not([data-intro-stage="complete"]) .timelineTopline > span:first-child { opacity: 0; }
+  .timeline[data-intro-active="true"] .timelineInstructions { animation-delay: 1.62s; animation-duration: .2s; }
+}
+
 @media (max-width: 1050px) {
   .toolbar { flex-wrap: wrap; }
   .stats { gap: 17px; }
@@ -146,8 +193,10 @@
   .timelineBottom { left: 13px; right: 13px; gap: 16px; }
   .timelineReadout { width: calc(100% - 36px); }
   .readoutContent { font-size: 13px; gap: 10px; }
+  .entryCounter { display: none; }
   .footer { font-size: 10px; letter-spacing: .02em; flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) {
   .page *, .page *::before, .page *::after { transition-duration: 0s !important; }
+  .timeline *, .page[data-entry="play"] .header, .page[data-entry="play"] .toolbar { animation: none !important; }
 }

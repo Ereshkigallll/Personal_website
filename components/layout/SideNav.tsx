@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { useExperienceEntry } from './ExperienceEntry'
 import {
   LayoutGrid,
   Briefcase,
@@ -25,6 +26,7 @@ const navItems = [
 
 export default function SideNav() {
   const pathname = usePathname()
+  const { enterFromProfile } = useExperienceEntry()
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex flex-col w-[var(--sidebar-width)] h-screen border-r border-[var(--color-border)] bg-[var(--color-surface)]/60 backdrop-blur-sm">
@@ -48,6 +50,7 @@ export default function SideNav() {
               title={label}
               aria-label={label}
               aria-current={active ? 'page' : undefined}
+              onClick={href === '/experience' ? enterFromProfile : undefined}
             >
               <div className="relative w-10 h-10 flex items-center justify-center">
                 {/* Sliding accent block */}

@@ -1,20 +1,24 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { AlignLeft, GitCommitHorizontal } from 'lucide-react'
 import type { Experience } from '@/content/experience'
 import { useLanguage } from '@/lib/language'
+import { useExperienceEntry } from '@/components/layout/ExperienceEntry'
 import ExperienceList from './ExperienceList'
 import ExperienceTimeline from './ExperienceTimeline'
 import { experienceFilters, type ExperienceFilter, type ExperienceView } from './experience-labels'
 import styles from './experience.module.css'
+import type { TimelineIntroMode } from './useTimelineIntro'
 
 const STORAGE_KEY = 'experience-archive'
 
 export default function ExperienceContent({ items, asOfDate }: { items: Experience[]; asOfDate: string }) {
   const { t } = useLanguage()
   const reduceMotion = useReducedMotion()
+  const { claimIntro, finishEntry } = useExperienceEntry()
+  const [introMode, setIntroMode] = useState<TimelineIntroMode>('pending')
   const [view, setView] = useState<ExperienceView>('timeline')
   const [activeFilter, setActiveFilter] = useState<ExperienceFilter>('all')
   const [focusId, setFocusId] = useState(items[0]?.id ?? '')
@@ -28,10 +32,13 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
     if (didRestore.current) return
     didRestore.current = true
     document.querySelector('main')?.scrollTo({ top: 0 })
+    const query = new URLSearchParams(window.location.search)
+    const returningToRecord = query.has('focus')
+    let preferredView: ExperienceView = query.get('view') === 'list' ? 'list' : 'timeline'
     try {
       const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '{}')
-      const query = new URLSearchParams(window.location.search)
       const nextView = query.get('view') ?? saved.view
+      preferredView = nextView === 'list' ? 'list' : 'timeline'
       const latest = items.find(item => saved.filter === 'all' || item.category === saved.filter) ?? items[0]
       const nextFocus = query.get('focus') ?? (saved.order === 'newest-first' ? saved.focusId : latest?.id)
       if (nextView === 'list' && query.has('focus')) listReturnFocus.current = nextFocus
@@ -49,8 +56,20 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
         window.history.replaceState(window.history.state, '', `${window.location.pathname}${remaining ? `?${remaining}` : ''}`)
       }
     } catch { /* Storage may be unavailable in a private browsing context. */ }
+    const playIntro = claimIntro(!returningToRecord && preferredView === 'timeline')
+    if (playIntro) {
+      setView('timeline')
+      setActiveFilter('all')
+      setFocusId(items[0]?.id ?? '')
+    } else finishEntry()
+    setIntroMode(playIntro ? 'play' : 'complete')
     setRestored(true)
-  }, [items])
+  }, [items, claimIntro, finishEntry])
+
+  const finishIntro = useCallback(() => {
+    setIntroMode('complete')
+    finishEntry()
+  }, [finishEntry])
 
   useEffect(() => {
     if (!restored) return
@@ -58,7 +77,7 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
   }, [view, focusId, activeFilter, restored])
 
   return (
-    <div className={`${styles.page} ${view === 'timeline' ? styles.timelinePage : 'max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto'}`}>
+    <div className={`${styles.page} ${view === 'timeline' ? styles.timelinePage : 'max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto'}`} data-entry={introMode}>
       <header className={styles.header}>
         <div>
           <p className={styles.eyebrow}><span />{t('Professional & Academic Record', '工作与学术履历')}</p>
@@ -84,6 +103,7 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
                 aria-pressed={activeFilter === filter.key}
                 aria-controls="experience-view"
                 onClick={() => {
+                  finishIntro()
                   setActiveFilter(filter.key)
                   if (filter.key !== 'all' && !items.some(item => item.id === focusId && item.category === filter.key)) {
                     setFocusId(items.find(item => item.category === filter.key)!.id)
@@ -102,7 +122,7 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
           ] as const).map(option => {
             const Icon = option.icon
             return (
-              <button key={option.key} type="button" onClick={() => setView(option.key)} aria-pressed={view === option.key} aria-controls="experience-view">
+              <button key={option.key} type="button" onClick={() => { finishIntro(); setView(option.key) }} aria-pressed={view === option.key} aria-controls="experience-view">
                 {view === option.key && <motion.span className={styles.switchIndicator} layoutId="experience-view-switch" transition={{ duration: reduceMotion ? 0 : .25, ease: [.22, 1, .36, 1] }} />}
                 <Icon size={13} aria-hidden="true" /><span>{t(option.en, option.zh)}</span>
               </button>
@@ -127,7 +147,7 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
             }}
           >
             {view === 'timeline'
-              ? <ExperienceTimeline items={items} visibleItems={filtered} asOfDate={asOfDate} focusId={focusId} onFocusChange={setFocusId} ready={restored} />
+              ? <ExperienceTimeline items={items} visibleItems={filtered} asOfDate={asOfDate} focusId={focusId} onFocusChange={setFocusId} ready={restored} introMode={introMode} onIntroComplete={finishIntro} />
               : <ExperienceList items={filtered} />}
           </motion.div>
         </AnimatePresence>
