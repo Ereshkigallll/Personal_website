@@ -1,0 +1,84 @@
+.shell {
+  width: 100%;
+  max-width: 112rem;
+  min-width: 0;
+  margin-inline: auto;
+  container-type: inline-size;
+}
+
+/* Scale the whole reading hierarchy with the available content width. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 1.5cqw, 28px);
+  min-width: 0;
+  font-size: clamp(1rem, calc(.75rem + .4cqw), 1.25rem);
+  line-height: 1.6;
+}
+
+.header, .formPanel {
+  padding: clamp(24px, 2.2cqw, 40px);
+}
+
+.title {
+  font-size: clamp(2.25rem, 3.7cqw, 4rem);
+  line-height: 1.1;
+}
+
+.titleAccent { color: var(--color-accent); }
+.monogram { font-size: 3.25em; }
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(20px, 1.5cqw, 28px);
+}
+
+.formColumn, .sidebar { min-width: 0; }
+.formPanel { height: 100%; }
+.form { flex: 1; }
+.messageField { flex: 1; min-height: 0; }
+.messageInput { position: relative; display: flex; flex: 1; }
+.messageInput .field { flex: 1; }
+
+.field {
+  min-width: 0;
+  font-size: 1em;
+  line-height: 1.6;
+  border-radius: 0;
+}
+
+.field::placeholder { opacity: 1; }
+textarea.field { min-height: 14rem; }
+.sendButton { min-height: 48px; }
+.sendButton svg { width: 1.15em; height: 1.15em; }
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 1.1cqw, 22px);
+}
+
+.sidebarPanel { padding: clamp(20px, 1.6cqw, 30px); }
+.notice { padding: clamp(18px, 1.3cqw, 24px); }
+.nodeLink { min-width: 0; gap: 12px; padding: clamp(12px, 1cqw, 18px); }
+.nodeIcon { width: 2.5em; height: 2.5em; }
+.nodeIcon svg { width: 1.2em; height: 1.2em; }
+.nodeText { min-width: 0; overflow-wrap: anywhere; gap: 2px; }
+
+@container (min-width: 1000px) {
+  .body { grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); }
+}
+
+@container (max-width: 600px) {
+  .header, .formPanel { padding: 24px 20px; }
+}
+
+@container (max-width: 320px) {
+  .header, .formPanel, .sidebarPanel { padding: 20px 16px; }
+  .title { font-size: 2rem; }
+  .nodeLink { gap: 8px; }
+  .nodeLink > div { gap: 10px; min-width: 0; }
+  .nodeIcon { width: 2.25em; height: 2.25em; }
+}
