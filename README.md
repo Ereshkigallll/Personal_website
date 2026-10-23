@@ -19,6 +19,8 @@ A personal portfolio website built with an OS-Terminal / Rhine Lab dashboard aes
 | Route | Description |
 |-------|-------------|
 | `/profile` | Identity card, active projects, system metrics |
+| `/experience` | Switchable horizontal timeline and list for education, work, research and teaching |
+| `/experience/[slug]` | Experience details, contributions, related records and publication links |
 | `/research` | PhD research entries with serial numbers, abstracts, author avatars |
 | `/projects` | Project archive with category icons and source/demo links |
 | `/database` | Skill proficiency bars — Languages, Frameworks, Hardware |
@@ -103,6 +105,7 @@ pnpm start
 ## Customization
 
 - **Personal data** — edit files in `content/` (profile, projects, research, skills)
+- **Experience** — edit `content/experience.ts`; dates use `YYYY-MM`, with `endDate: null` for a current appointment. `period` adds a duration band, `parentId` supplies temporal context, and `timelineTitle` / `summary` supply bilingual previews. Both views show newest entries first. On the timeline, same-month records share a date and unfold together as scrolling continues; time stays still during the reveal. Narrow screens show one card at a time. Detail pages are generated from the same data.
 - **Colors** — update CSS variables in `app/globals.css`
 - **Navigation** — edit `components/layout/SideNav.tsx`
 - **Blog posts** — add `.mdx` files to `app/logs/` (MDX pipeline via next-mdx-remote)

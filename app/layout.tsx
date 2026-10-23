@@ -40,7 +40,7 @@ export default function RootLayout({
               style={{ marginLeft: 'var(--sidebar-width)' }}
             >
               <main
-                className="flex-1 overflow-y-auto px-8 pb-8"
+                className="flex-1 overflow-y-auto px-4 sm:px-8 pb-8"
                 style={{ paddingTop: 'calc(var(--topbar-height) + 1.5rem)' }}
               >
                 {children}

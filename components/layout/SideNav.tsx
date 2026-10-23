@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   LayoutGrid,
+  Briefcase,
   Database,
   FolderOpen,
   FlaskConical,
@@ -14,6 +15,7 @@ import {
 
 const navItems = [
   { href: '/profile',   icon: LayoutGrid,   label: 'PROFILE'      },
+  { href: '/experience', icon: Briefcase,   label: 'EXPERIENCE'   },
   { href: '/research',  icon: FlaskConical,  label: 'RESEARCH'     },
   { href: '/projects',  icon: FolderOpen,    label: 'PROJECTS'     },
   { href: '/database',  icon: Database,      label: 'SKILL MATRIX' },
@@ -35,7 +37,7 @@ export default function SideNav() {
       </div>
 
       {/* Nav items */}
-      <nav className="flex-1 flex flex-col items-center gap-6 py-2">
+      <nav className="flex-1 flex flex-col items-center gap-4 sm:gap-6 py-2">
         {navItems.map(({ href, icon: Icon, label }) => {
           const active = pathname === href || pathname.startsWith(href + '/')
           return (
@@ -44,6 +46,8 @@ export default function SideNav() {
               href={href}
               className="group relative flex flex-col items-center w-full"
               title={label}
+              aria-label={label}
+              aria-current={active ? 'page' : undefined}
             >
               <div className="relative w-10 h-10 flex items-center justify-center">
                 {/* Sliding accent block */}

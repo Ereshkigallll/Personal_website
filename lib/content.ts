@@ -22,7 +22,7 @@ function readMd(subdir: string): Raw[] {
   return fs
     .readdirSync(dir)
     .filter(f => f.endsWith('.md'))
-    .map(file => {
+    .map((file): Raw => {
       const { data, content } = matter(fs.readFileSync(path.join(dir, file), 'utf8'))
       return { ...data, slug: file.replace(/\.md$/, ''), body: content.trim() }
     })

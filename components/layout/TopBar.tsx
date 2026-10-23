@@ -13,13 +13,13 @@ export default function TopBar() {
         className="fixed top-0 right-0 z-30 flex items-center px-8 h-[var(--topbar-height)] pointer-events-none"
         style={{ left: 'var(--sidebar-width)' }}
       >
-        <p className="font-mono text-xs font-bold tracking-widest uppercase opacity-40 select-none">
+        <p className="hidden sm:block font-mono text-xs font-bold tracking-widest uppercase opacity-40 select-none">
           Portfolio <span className="mx-2">//</span> HR Department
         </p>
       </header>
 
       {/* Status controls — independently anchored to top-right */}
-      <div className="fixed top-0 right-0 z-40 flex items-center gap-3 px-8 h-[var(--topbar-height)] pointer-events-auto">
+      <div className="fixed top-0 right-0 z-40 flex items-center gap-3 px-4 sm:px-8 h-[var(--topbar-height)] pointer-events-auto">
 
         {/* CONNECTED badge */}
         <div className="flex items-center gap-2 px-3 py-1 bg-[var(--color-surface)]/60 backdrop-blur border border-[var(--color-border)] rounded-full">
