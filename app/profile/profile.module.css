@@ -1,0 +1,46 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  min-width: 0;
+  padding-block: clamp(12px, 1.5vh, 24px);
+}
+
+.shell {
+  width: 100%;
+  max-width: 112rem;
+  min-width: 0;
+  margin: auto;
+  container-type: inline-size;
+}
+
+/* All supporting type uses em, so it grows with the card instead of staying at 9–12px. */
+.card, .ticker {
+  font-size: clamp(1rem, calc(.75rem + .4cqw), 1.25rem);
+}
+
+.card { min-height: min(76dvh, 1120px); }
+.identity { min-width: 0; padding: clamp(24px, 3cqw, 64px); }
+.sidebar { min-width: 0; padding: clamp(24px, 2.5cqw, 56px); }
+.name { font-size: clamp(2.5rem, 5.4cqw, 6rem); overflow-wrap: anywhere; }
+.sectionGap { margin-top: clamp(24px, 2cqw, 36px); }
+.quote { font-size: 1em; max-width: 42ch; min-height: 3.5em; }
+.stats { max-width: 30rem; }
+.clock { gap: 12px; flex-wrap: wrap; }
+.clockDate { flex: 1 1 12em; }
+.focusCard { display: flex; padding: clamp(14px, 1.05cqw, 20px); gap: 16px; }
+.metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+@container (max-width: 320px) {
+  .metrics { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 1023px) {
+  .card { min-height: 0; }
+}
+
+@media (max-width: 640px) {
+  .page { padding-block: 8px; }
+  .identity, .sidebar { padding: 24px 20px; }
+  .name { overflow-wrap: normal; }
+}

@@ -10,6 +10,7 @@ import { researchItems } from '@/content/research'
 import { skills } from '@/content/skills'
 import { useLanguage } from '@/lib/language'
 import { useBootDone } from '@/lib/boot-context'
+import styles from './profile.module.css'
 
 /* ── Types & constants ─────────────────────────────────────────────── */
 type Phase = 'expanding' | 'decrypting' | 'complete' | 'revealed'
@@ -108,10 +109,10 @@ function NetworkMetric({ label }: { label: string }) {
   return (
     <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-3">
       <div className="flex justify-between items-end mb-2">
-        <span className="font-mono text-[10px] text-[var(--color-muted)] uppercase tracking-wider">
+        <span className="font-mono text-[0.75em] text-[var(--color-muted)] uppercase tracking-wider">
           {label}
         </span>
-        <motion.span className="font-mono text-xs font-bold text-[var(--color-accent)]">
+        <motion.span className="font-mono text-[0.8em] font-bold text-[var(--color-accent)]">
           {displayMs}
         </motion.span>
       </div>
@@ -148,14 +149,14 @@ function LocalClock() {
   const tz   = now ? Intl.DateTimeFormat().resolvedOptions().timeZone   : '—'
 
   return (
-    <div className="flex items-center justify-between border border-[var(--color-border)] bg-[var(--color-surface)]/50 px-3 py-2 font-mono">
-      <div className="flex items-center gap-2 min-w-0">
+    <div className={`${styles.clock} flex items-center justify-between border border-[var(--color-border)] bg-[var(--color-surface)]/50 px-3 py-2 font-mono`}>
+      <div className={`${styles.clockDate} flex items-center gap-2 min-w-0`}>
         <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-breathe shrink-0" />
-        <span className="text-[9px] text-[var(--color-muted)] uppercase tracking-wider truncate">
+        <span className="text-[0.75em] text-[var(--color-muted)] uppercase tracking-wider truncate">
           {date} · {tz}
         </span>
       </div>
-      <span className="text-sm font-bold text-[var(--color-accent)] tabular-nums tracking-wider shrink-0">
+      <span className="text-[1em] font-bold text-[var(--color-accent)] tabular-nums tracking-wider shrink-0">
         {time}
       </span>
     </div>
@@ -165,11 +166,11 @@ function LocalClock() {
 /* ── Status ticker ─────────────────────────────────────────────────── */
 const TICKER_ITEMS = [
   'SYSTEM ONLINE',
-  'STATUS // OPEN FOR WORK',
-  'NODE // COLUMBIA_HQ',
+  'STATUS // ROBOTICS ENGINEER',
+  'PIPELINE // SIMULATION TO HARDWARE',
   'CLEARANCE // LVL.5 GRANTED',
   'UPLINK // STABLE',
-  'HCI · VR · ROBOTICS · IOT',
+  'ROBOT LEARNING · LOCOMOTION · SIM-TO-REAL',
 ]
 
 function TickerRow() {
@@ -177,8 +178,8 @@ function TickerRow() {
     <div className="flex items-center shrink-0">
       {TICKER_ITEMS.map((it, i) => (
         <span key={i} className="flex items-center shrink-0">
-          <span className="font-mono text-[9px] tracking-widest uppercase text-[var(--color-muted)]">{it}</span>
-          <span className="mx-5 text-[8px] text-[var(--color-accent)]">◆</span>
+          <span className="font-mono text-[0.75em] tracking-widest uppercase text-[var(--color-muted)]">{it}</span>
+          <span className="mx-5 text-[0.75em] text-[var(--color-accent)]">◆</span>
         </span>
       ))}
     </div>
@@ -198,10 +199,10 @@ function Stat({ label, value, active, delay }: { label: string; value: number; a
 
   return (
     <div className="flex flex-col">
-      <motion.span className="font-mono text-3xl 2xl:text-4xl font-bold tabular-nums leading-none">
+      <motion.span className="font-mono text-[1.8em] font-bold tabular-nums leading-none">
         {display}
       </motion.span>
-      <span className="font-mono text-[9px] text-[var(--color-muted)] uppercase tracking-wider mt-1.5">
+      <span className="font-mono text-[0.75em] text-[var(--color-muted)] uppercase tracking-wider mt-1.5">
         {label}
       </span>
     </div>
@@ -227,7 +228,7 @@ function EmailButton() {
     >
       <div className="flex items-center gap-3 min-w-0">
         <Mail size={16} className="shrink-0 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors" />
-        <span className="font-mono text-[11px] text-[var(--color-text)] truncate">
+        <span className="font-mono text-[0.85em] text-[var(--color-text)] truncate">
           {addr || t('EMAIL', '邮箱')}
         </span>
       </div>
@@ -302,7 +303,7 @@ export default function ProfileContent() {
   const isDecrypting    = phase === 'decrypting'
   const scrambledId     = useScramble(profile.id,                    isDecrypting,   0)
   const scrambledName   = useScramble(profile.name,                  isDecrypting, 150)
-  const scrambledDept   = useScramble('HCI RESEARCH & ENGINEERING',  isDecrypting, 350)
+  const scrambledDept   = useScramble(t(profile.department.en, profile.department.zh), isDecrypting, 350)
   const scrambledLevel  = useScramble('LEVEL 5 — CLASSIFIED',        isDecrypting, 600)
 
   /* ── Decrypt progress bar ── */
@@ -316,17 +317,6 @@ export default function ProfileContent() {
     }
   }, [phase, pct])
 
-  /* ── Active projects ── */
-  const activeProjects = profile.activeProjects.map(ap => {
-    const project = projects.find(p => p.slug === ap.slug)
-    return {
-      key:   ap.key,
-      title: project?.title ?? ap.slug,
-      sub:   t(ap.sub.en, ap.sub.zh),
-      slug:  ap.slug,
-    }
-  })
-
   const revealed = phase === 'revealed'
 
   /* Bio typewriter — types out once the card is revealed */
@@ -334,15 +324,15 @@ export default function ProfileContent() {
   const { shown: bioShown, done: bioDone } = useTypewriter(bioText, revealed && !skipAnim, 24, 450)
 
   return (
-    <div className="min-h-full flex flex-col py-6">
-      <div className="w-full max-w-5xl xl:max-w-6xl 2xl:max-w-[88rem] mx-auto my-auto">
+    <div className={styles.page}>
+      <div className={styles.shell}>
       <motion.div
         style={{ transformOrigin: 'center center' }}
         initial={{ scaleY: 0, opacity: 0 }}
         animate={ready ? { scaleY: 1, opacity: 1 } : { scaleY: 0, opacity: 0 }}
         transition={{ duration: skipAnim ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="panel-acrylic rounded-none grid grid-cols-1 lg:grid-cols-12 overflow-hidden min-h-[520px] xl:min-h-[64vh] 2xl:min-h-[72vh] relative">
+        <div className={`${styles.card} panel-acrylic rounded-none grid grid-cols-1 lg:grid-cols-12 overflow-hidden relative`}>
 
           {/* HUD scanline texture */}
           <div className="absolute inset-0 hud-scanlines pointer-events-none z-[1]" />
@@ -370,7 +360,7 @@ export default function ProfileContent() {
                       transition={{ duration: 0.2 }}
                     >
                       <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-accent)] animate-breathe" />
-                      <span className="font-mono text-[9px] text-[var(--color-muted)] uppercase tracking-widest">
+                      <span className="font-mono text-[0.75em] text-[var(--color-muted)] uppercase tracking-widest">
                         Initialising...
                       </span>
                     </motion.div>
@@ -389,7 +379,7 @@ export default function ProfileContent() {
                       {/* Header */}
                       <div className="flex items-center gap-2 mb-5">
                         <span className="w-1.5 h-1.5 bg-[var(--color-accent)] animate-breathe shrink-0" />
-                        <span className="text-[9px] uppercase tracking-widest text-[var(--color-accent)]">
+                        <span className="text-[0.75em] uppercase tracking-widest text-[var(--color-accent)]">
                           Accessing Secure Database
                         </span>
                         <span className="text-[var(--color-accent)] animate-pulse ml-0.5">█</span>
@@ -397,7 +387,7 @@ export default function ProfileContent() {
 
                       {/* Progress */}
                       <div className="mb-5">
-                        <div className="flex justify-between text-[9px] text-[var(--color-muted)] mb-1.5">
+                        <div className="flex justify-between text-[0.75em] text-[var(--color-muted)] mb-1.5">
                           <span>Decrypting Identity Record</span>
                           <motion.span className="text-[var(--color-accent)]">{displayPct}</motion.span>
                         </div>
@@ -415,8 +405,8 @@ export default function ProfileContent() {
                           { label: 'CLEARANCE', value: scrambledLevel },
                         ].map(({ label, value }) => (
                           <div key={label} className="flex gap-3 px-3 py-2">
-                            <span className="text-[9px] text-[var(--color-muted)] w-20 shrink-0">{label}</span>
-                            <span className="text-[9px] font-bold text-[var(--color-text)] truncate">{value || '—'}</span>
+                            <span className="text-[0.75em] text-[var(--color-muted)] w-20 shrink-0">{label}</span>
+                            <span className="text-[0.75em] font-bold text-[var(--color-text)] truncate">{value || '—'}</span>
                           </div>
                         ))}
                       </div>
@@ -435,7 +425,7 @@ export default function ProfileContent() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="h-px w-10 bg-[var(--color-accent)]" />
-                        <span className="font-mono text-[10px] text-[var(--color-muted)]">◆</span>
+                        <span className="font-mono text-[0.75em] text-[var(--color-muted)]">◆</span>
                         <div className="h-px w-10 bg-[var(--color-accent)]" />
                       </div>
                       <span
@@ -446,10 +436,10 @@ export default function ProfileContent() {
                       </span>
                       <div className="flex items-center gap-3">
                         <div className="h-px w-10 bg-[var(--color-accent)]" />
-                        <span className="font-mono text-[10px] text-[var(--color-muted)]">◆</span>
+                        <span className="font-mono text-[0.75em] text-[var(--color-muted)]">◆</span>
                         <div className="h-px w-10 bg-[var(--color-accent)]" />
                       </div>
-                      <span className="font-mono text-[9px] text-[var(--color-muted)] tracking-widest uppercase mt-1">
+                      <span className="font-mono text-[0.75em] text-[var(--color-muted)] tracking-widest uppercase mt-1">
                         Clearance Level 5 — Access Granted
                       </span>
                     </motion.div>
@@ -463,7 +453,7 @@ export default function ProfileContent() {
 
           {/* ── Left: Identity ── */}
           <div
-            className={`lg:col-span-7 p-10 md:p-12 2xl:p-16 border-b lg:border-b-0 lg:border-r border-[var(--color-border)] flex flex-col justify-between relative transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0'}`}
+            className={`${styles.identity} lg:col-span-7 border-b lg:border-b-0 lg:border-r border-[var(--color-border)] flex flex-col justify-between relative transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0'}`}
           >
             {/* Corner bracket */}
             <div className="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-[var(--color-text)] opacity-10 pointer-events-none" />
@@ -477,16 +467,16 @@ export default function ProfileContent() {
                     <svg className="w-3.5 h-3.5 text-[var(--color-muted)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="16" y2="10"/><line x1="12" y1="14" x2="16" y2="14"/>
                     </svg>
-                    <span className="font-mono text-[10px] tracking-widest font-bold">{profile.id}</span>
+                    <span className="font-mono text-[0.75em] tracking-widest font-bold">{profile.id}</span>
                   </div>
-                  <span className="font-mono text-[9px] text-[var(--color-muted)] uppercase tracking-wider">
+                  <span className="font-mono text-[0.75em] text-[var(--color-muted)] uppercase tracking-wider">
                     {t('Verified Identity', '已验证身份')}
                   </span>
                 </div>
               </div>
 
               {/* Name */}
-              <h1 className="text-5xl md:text-7xl 2xl:text-8xl font-bold tracking-tighter leading-none mb-2">
+              <h1 className={`${styles.name} font-bold tracking-tighter leading-none mb-2`}>
                 {profile.name}
               </h1>
               {/* Accent underline */}
@@ -494,33 +484,33 @@ export default function ProfileContent() {
 
               {/* Department */}
               <div className="space-y-1 mb-6">
-                <p className="font-mono text-xs text-[var(--color-muted)] uppercase tracking-wider">
-                  {t('Department', '部门')}
+                <p className="font-mono text-[0.8em] text-[var(--color-muted)] uppercase tracking-wider">
+                  {t('Discipline', '专业领域')}
                 </p>
-                <p className="text-xl font-semibold tracking-tight">
+                <p className="text-[1.25em] font-semibold tracking-tight">
                   {t(profile.department.en, profile.department.zh)}
                 </p>
               </div>
 
               {/* Specialization */}
               <div className="space-y-1">
-                <p className="font-mono text-xs text-[var(--color-muted)] uppercase tracking-wider">
+                <p className="font-mono text-[0.8em] text-[var(--color-muted)] uppercase tracking-wider">
                   {t('Specialisation', '专业方向')}
                 </p>
-                <p className="text-lg font-light text-[var(--color-text)]">
+                <p className="text-[1.125em] font-light text-[var(--color-text)]">
                   {t(profile.specialization.en, profile.specialization.zh)}
                 </p>
               </div>
 
-              {/* Bio quote — typed out */}
-              <div className="mt-10 p-4 bg-[var(--color-bg)]/70 border-l-2 border-[var(--color-accent)]">
-                <p className="font-mono text-[10px] leading-relaxed text-[var(--color-muted)] max-w-xs min-h-[3.5em]">
-                  "{bioShown}"{!bioDone && <span className="text-[var(--color-accent)] animate-pulse">▋</span>}
+              {/* Personal motto — typed out */}
+              <blockquote className={`${styles.sectionGap} p-4 bg-[var(--color-bg)]/70 border-l-2 border-[var(--color-accent)]`}>
+                <p className={`${styles.quote} font-mono leading-relaxed text-[var(--color-muted)]`}>
+                  “{bioShown}”{!bioDone && <span className="text-[var(--color-accent)] animate-pulse">▋</span>}
                 </p>
-              </div>
+              </blockquote>
 
               {/* Stats overview */}
-              <div className="mt-10 grid grid-cols-3 gap-4 max-w-sm border-t border-[var(--color-border)] pt-6">
+              <div className={`${styles.sectionGap} ${styles.stats} grid grid-cols-3 gap-4 border-t border-[var(--color-border)] pt-6`}>
                 <Stat label={t('Projects', '项目')} value={projects.length}      active={revealed} delay={0.1} />
                 <Stat label={t('Research', '研究')} value={researchItems.length} active={revealed} delay={0.2} />
                 <Stat label={t('Skills',   '技能')} value={skills.length}        active={revealed} delay={0.3} />
@@ -528,27 +518,27 @@ export default function ProfileContent() {
             </div>
 
             {/* Bottom: clearance + availability */}
-            <div className="mt-10 flex items-center gap-8">
+            <div className={`${styles.sectionGap} flex flex-wrap items-center gap-6`}>
               <div>
-                <p className="font-mono text-[10px] text-[var(--color-muted)] uppercase tracking-wider mb-1">
+                <p className="font-mono text-[0.75em] text-[var(--color-muted)] uppercase tracking-wider mb-1">
                   {t('Clearance', '权限级别')}
                 </p>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-3xl font-bold font-mono tracking-tight">
                     Lvl.{profile.clearanceLevel}
                   </span>
-                  <span className="font-mono text-[10px] bg-[var(--color-accent)] text-black px-1.5 py-0.5 font-bold tracking-wider">
+                  <span className="font-mono text-[0.75em] bg-[var(--color-accent)] text-black px-1.5 py-0.5 font-bold tracking-wider">
                     {t('GRANTED', '已授权')}
                   </span>
                 </div>
               </div>
               <div>
-                <p className="font-mono text-[10px] text-[var(--color-muted)] uppercase tracking-wider mb-1">
+                <p className="font-mono text-[0.75em] text-[var(--color-muted)] uppercase tracking-wider mb-1">
                   {t('Availability', '状态')}
                 </p>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-sky-500 animate-breathe shrink-0" />
-                  <span className="text-sm font-bold font-mono uppercase tracking-wide">
+                  <span className="text-[1em] font-bold font-mono uppercase tracking-wide">
                     {t(profile.statusLabel.en, profile.statusLabel.zh)}
                   </span>
                 </div>
@@ -556,32 +546,32 @@ export default function ProfileContent() {
             </div>
           </div>
 
-          {/* ── Right: Active Projects + System Metrics ── */}
+          {/* ── Right: Robotics Focus + System Metrics ── */}
           <div
-            className={`lg:col-span-5 bg-[var(--color-bg)]/40 p-8 md:p-10 2xl:p-12 flex flex-col gap-6 relative transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0'}`}
+            className={`${styles.sidebar} lg:col-span-5 bg-[var(--color-bg)]/40 flex flex-col gap-6 relative transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0'}`}
           >
             {/* Local terminal clock */}
             <LocalClock />
 
-            {/* Active Projects */}
+            {/* Current robotics directions */}
             <div>
-              <h2 className="font-mono text-xs font-bold uppercase tracking-widest border-b border-[var(--color-border)] pb-3 mb-5 flex justify-between items-center">
-                <span>{t('Active Projects', '活跃项目')}</span>
-                <span className="text-[10px] text-[var(--color-muted)] tabular-nums">
-                  {String(activeProjects.length).padStart(2, '0')}
+              <h2 className="font-mono text-[0.8em] font-bold uppercase tracking-widest border-b border-[var(--color-border)] pb-3 mb-5 flex justify-between items-center">
+                <span>{t('Current Robotics Focus', '当前机器人方向')}</span>
+                <span className="text-[1em] text-[var(--color-muted)] tabular-nums">
+                  {String(profile.currentFocus.length).padStart(2, '0')}
                 </span>
               </h2>
 
               <ul className="space-y-2.5">
-                {activeProjects.map(({ key, title, sub, slug }) => (
+                {profile.currentFocus.map(({ key, title, sub }) => (
                   <li key={key} className="group transform transition-transform hover:translate-x-1">
-                    <Link href={`/projects/${slug}`}>
-                      <div className="clip-key bg-[var(--color-surface)] border border-[var(--color-border)] group-hover:border-[var(--color-accent)]/50 group-hover:shadow-key-glow p-3 flex items-center justify-between relative overflow-hidden transition-all">
+                    <Link href="/experience/westlake-robotics?view=timeline" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]">
+                      <div className={`${styles.focusCard} clip-key bg-[var(--color-surface)] border border-[var(--color-border)] group-hover:border-[var(--color-accent)]/50 group-hover:shadow-key-glow items-center justify-between relative overflow-hidden transition-all`}>
                         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-border)] group-hover:bg-[var(--color-accent)] transition-colors" />
-                        <div className="pl-3">
-                          <span className="font-mono text-[9px] text-[var(--color-muted)] group-hover:text-[var(--color-accent)] block mb-0.5 transition-colors">{key}</span>
-                          <span className="font-bold text-sm block leading-snug">{title}</span>
-                          <span className="font-mono text-[9px] text-[var(--color-muted)] mt-0.5 block">{sub}</span>
+                        <div className="pl-3 min-w-0">
+                          <span className="font-mono text-[0.75em] text-[var(--color-muted)] group-hover:text-[var(--color-accent)] block mb-0.5 transition-colors">{key}</span>
+                          <span className="font-bold text-[1em] block leading-snug">{t(title.en, title.zh)}</span>
+                          <span className="font-mono text-[0.75em] text-[var(--color-muted)] mt-0.5 block">{t(sub.en, sub.zh)}</span>
                         </div>
                         <ArrowRight size={16} className="shrink-0 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors" />
                       </div>
@@ -597,7 +587,7 @@ export default function ProfileContent() {
                     <div className="absolute inset-0 bg-[var(--color-accent)]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                     <div className="relative flex items-center justify-center gap-2.5">
                       <Database size={16} className="text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors" />
-                      <span className="font-mono text-xs font-bold tracking-widest text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">
+                      <span className="font-mono text-[0.8em] font-bold tracking-widest text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">
                         {t('ENTER MATRIX', '进入技能矩阵')}
                       </span>
                     </div>
@@ -613,22 +603,22 @@ export default function ProfileContent() {
 
             {/* System Metrics */}
             <div className="mt-auto">
-              <h2 className="font-mono text-xs font-bold uppercase tracking-widest border-b border-[var(--color-border)] pb-3 mb-5">
+              <h2 className="font-mono text-[0.8em] font-bold uppercase tracking-widest border-b border-[var(--color-border)] pb-3 mb-5">
                 {t('System Metrics', '系统状态')}
               </h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className={styles.metrics}>
                 <NetworkMetric label={t('Network', '网络')} />
                 <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-3">
                   <div className="flex justify-between items-end mb-2">
-                    <span className="font-mono text-[10px] text-[var(--color-muted)] uppercase tracking-wider">
+                    <span className="font-mono text-[0.75em] text-[var(--color-muted)] uppercase tracking-wider">
                       {t('Energy', '能量')}
                     </span>
-                    <span className="font-mono text-xs font-bold text-[var(--color-accent)]">98%</span>
+                    <span className="font-mono text-[0.8em] font-bold text-[var(--color-accent)]">98%</span>
                   </div>
                   <div className="w-full bg-[var(--color-border)] h-1.5 mt-4 overflow-hidden">
                     <div className="bg-[var(--color-text)] h-full" style={{ width: '98%' }} />
                   </div>
-                  <div className="mt-2 font-mono text-[9px] text-[var(--color-muted)] text-right tracking-widest">
+                  <div className="mt-2 font-mono text-[0.75em] text-[var(--color-muted)] text-right tracking-widest">
                     {t('STABLE', '稳定')}
                   </div>
                 </div>
@@ -643,7 +633,7 @@ export default function ProfileContent() {
       </motion.div>
 
       {/* Status ticker */}
-      <div className={`mt-3 transition-opacity duration-700 ${revealed ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`${styles.ticker} mt-3 transition-opacity duration-700 ${revealed ? 'opacity-100' : 'opacity-0'}`}>
         <div className="overflow-hidden border-y border-[var(--color-border)] bg-[var(--color-surface)]/40 py-2">
           <div className="flex whitespace-nowrap animate-marquee">
             <TickerRow />

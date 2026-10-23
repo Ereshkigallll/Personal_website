@@ -90,7 +90,9 @@ github: https://github.com/你的用户名/仓库
 
 ## 关于首页(profile)的数据
 
-首页身份卡上的「项目 / 研究**数量**」统计、以及「活跃项目」列表,目前仍读旧的 `content/profile.ts` 和 `content/projects.ts`。如果你希望首页也跟着这些 md 文件自动更新,告诉我,我帮你接上(需要小改一下首页的取数方式)。
+首页身份卡上的项目、研究和技能数量，分别读取 `content/projects.ts`、`content/research.ts` 和 `content/skills.ts`。
+
+首页的专业领域、专业方向、个人寄语，以及右侧「当前机器人方向」，在 `content/profile.ts` 维护中英文内容。`currentFocus` 根据机器人岗位的工作内容整理，点击后进入对应的工作经历详情。
 
 ## 经历页 (Experience)
 
