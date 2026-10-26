@@ -55,6 +55,7 @@ export function formatExperienceDate(date: string, lang: 'en' | 'zh') {
 
 /** Share a date anchor within each month; leave room for the opened group. */
 export function buildExperienceTimeline(items: Experience[], asOfDate: string, metrics = experienceTimelineMetrics(1440)) {
+  const asOfMonth = asOfDate.slice(0, 7)
   const firstMonth = Math.min(...items.map(item => monthNumber(item.startDate)))
   const lastMonth = Math.max(monthNumber(asOfDate), ...items.map(item => monthNumber(item.endDate ?? asOfDate)))
   const events = items.filter(item => item.category !== 'education')
@@ -88,12 +89,17 @@ export function buildExperienceTimeline(items: Experience[], asOfDate: string, m
     cursor += metrics.monthWidth
   }
 
+  // Position today within its month so an ongoing card also grows between builds.
+  const [year, month, day = 1] = asOfDate.split('-').map(Number)
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate()
+  const today = datePositions.get(asOfMonth)! + (Math.max(1, Math.min(day, daysInMonth)) - 1) / daysInMonth * metrics.monthWidth
+
   const laneEnds: number[] = []
   const periods = items.filter(item => item.period)
     .sort((a, b) => a.startDate.localeCompare(b.startDate))
     .map(item => {
       const start = datePositions.get(item.startDate)!
-      const end = datePositions.get(item.endDate ?? asOfDate)!
+      const end = item.endDate ? datePositions.get(item.endDate)! : today
       let lane = laneEnds.findIndex(lastEnd => lastEnd <= start)
       if (lane === -1) lane = laneEnds.length
       laneEnds[lane] = end
@@ -108,6 +114,7 @@ export function buildExperienceTimeline(items: Experience[], asOfDate: string, m
 
   return {
     dates: dates.map(tick => ({ ...tick, x: cursor - tick.x })).reverse(),
+    now: { x: cursor - today, date: asOfDate },
     groups: groups.map(group => ({ ...group, x: cursor - group.x })).reverse(),
     eventPositions: new Map(Array.from(eventPositions).map(([id, point]) => [id, {
       x: cursor - point.x,
@@ -127,7 +134,7 @@ export function buildExperienceTimeline(items: Experience[], asOfDate: string, m
 export type ExperienceTimelineLayout = ReturnType<typeof buildExperienceTimeline>
 
 /** Extra scroll distance unfolds siblings while the visible date stays still. */
-export function buildExperienceJourney(layout: ExperienceTimelineLayout, visibleIds: Set<string>) {
+export function buildExperienceJourney(layout: ExperienceTimelineLayout, visibleIds: Set<string>, viewportWidth = 0) {
   let extra = 0
   const groups = layout.groups.map(group => ({ ...group, ids: group.ids.filter(id => visibleIds.has(id)) }))
     .filter(group => group.ids.length > 0)
@@ -138,6 +145,12 @@ export function buildExperienceJourney(layout: ExperienceTimelineLayout, visible
       return { ...group, start, end }
     })
   const stops = layout.stops.filter(stop => visibleIds.has(stop.id)).map(stop => {
+    const ongoing = layout.periods.find(({ item }) => item.id === stop.id && item.category !== 'education' && item.endDate === null)
+    if (ongoing && viewportWidth > 0 && ongoing.end - ongoing.start > viewportWidth / 2 - Math.max(20, viewportWidth * .09)) {
+      // Center a wide interval on a narrow rail so its sticky text has room to fit.
+      const midpoint = (ongoing.start + ongoing.end) / 2
+      return { id: stop.id, x: midpoint + groups.filter(entry => entry.x < midpoint).reduce((total, entry) => total + entry.end - entry.start, 0) }
+    }
     const group = groups.find(entry => entry.ids.includes(stop.id))
     const x = group
       ? group.start + group.ids.indexOf(stop.id) * TIMELINE_REVEAL_DISTANCE

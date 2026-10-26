@@ -25,10 +25,22 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
   const [activeFilter, setActiveFilter] = useState<ExperienceFilter>('all')
   const [focusId, setFocusId] = useState(items[0]?.id ?? '')
   const [restored, setRestored] = useState(false)
+  const [today, setToday] = useState(asOfDate)
   const didRestore = useRef(false)
   const listReturnFocus = useRef<string | null>(null)
   const filtered = useMemo(() => activeFilter === 'all' ? items : items.filter(item => item.category === activeFilter), [items, activeFilter])
   const currentCount = items.filter(item => item.endDate === null).length
+
+  useEffect(() => {
+    const updateToday = () => {
+      const date = new Date()
+      setToday(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`)
+    }
+    updateToday()
+    const timer = setInterval(updateToday, 60_000)
+    window.addEventListener('focus', updateToday)
+    return () => { clearInterval(timer); window.removeEventListener('focus', updateToday) }
+  }, [])
 
   useEffect(() => {
     if (!bootDone || didRestore.current) return
@@ -148,7 +160,7 @@ export default function ExperienceContent({ items, asOfDate }: { items: Experien
             }}
           >
             {view === 'timeline'
-              ? <ExperienceTimeline items={items} visibleItems={filtered} asOfDate={asOfDate} focusId={focusId} onFocusChange={setFocusId} ready={restored} introMode={introMode} onIntroComplete={finishIntro} />
+              ? <ExperienceTimeline items={items} visibleItems={filtered} asOfDate={today} focusId={focusId} onFocusChange={setFocusId} ready={restored} introMode={introMode} onIntroComplete={finishIntro} />
               : <ExperienceList items={filtered} />}
           </motion.div>
         </AnimatePresence>

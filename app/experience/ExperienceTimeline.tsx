@@ -14,7 +14,9 @@ import { experienceCategories } from './experience-labels'
 import styles from './experience.module.css'
 import { useTimelineIntro, type TimelineIntroMode } from './useTimelineIntro'
 
-function EventCard({ item, index, group, travel, timeX, metrics, compact, focused, onKeyboardFocus }: {
+type OngoingSpan = { start: number; end: number }
+
+function EventCard({ item, index, group, travel, timeX, metrics, compact, focused, span, onKeyboardFocus }: {
   item: Experience
   index: number
   group: ExperienceEventGroup
@@ -23,15 +25,20 @@ function EventCard({ item, index, group, travel, timeX, metrics, compact, focuse
   metrics: ExperienceTimelineMetrics
   compact: boolean
   focused: boolean
+  span?: OngoingSpan
   onKeyboardFocus: () => void
 }) {
   const { t } = useLanguage()
   const reduceMotion = useReducedMotion()
   const reveal = useTransform(travel, value => timelineGroupReveal(group, value))
   const visibility = useTransform(reveal, value => index === 0 ? 1 : Math.max(0, Math.min(1, value - index + 1)))
-  const offset = useTransform(reveal, value => timelineCardOffset(index, value, compact, metrics.cardWidth))
-  const distance = useTransform(timeX, value => Math.min(1, Math.abs(value - group.x) / metrics.focusDistance))
-  const scale = useTransform(distance, value => reduceMotion ? 1 : 1 - value * .13)
+  const offset = useTransform(reveal, value => span ? 0 : timelineCardOffset(index, value, compact, metrics.cardWidth))
+  const distance = useTransform(timeX, value => {
+    const separation = span ? Math.max(span.start - value, value - span.end, 0) : Math.abs(value - group.x)
+    return Math.min(1, separation / metrics.focusDistance)
+  })
+  // A duration's horizontal edges stay attached to their dates while it focuses.
+  const scale = useTransform(distance, value => reduceMotion || span ? 1 : 1 - value * .13)
   const opacity = useTransform([distance, visibility], ([nearby, visible]: number[]) => (1 - nearby * .48) * visible)
   const height = useTransform(distance, value => reduceMotion ? metrics.cardHeight : metrics.cardHeight - value * (metrics.cardHeight - metrics.collapsedHeight))
   const summaryOpacity = useTransform(distance, value => Math.max(0, 1 - value * 2.5))
@@ -52,36 +59,42 @@ function EventCard({ item, index, group, travel, timeX, metrics, compact, focuse
   return (
     <motion.div
       className={styles.event}
-      style={{ x: offset, width: metrics.cardWidth, marginLeft: -metrics.cardWidth / 2, scale, opacity, height, pointerEvents: interactive ? 'auto' : 'none' }}
+      style={{ x: offset, width: span ? Math.max(1, span.end - span.start) : metrics.cardWidth, marginLeft: span ? span.start - group.x : -metrics.cardWidth / 2, scale, opacity, height, pointerEvents: interactive ? 'auto' : 'none' }}
       data-focused={focused}
       data-event-id={item.id}
+      data-ongoing={Boolean(span)}
       aria-hidden={!interactive}
     >
       <Link
         href={`/experience/${item.id}?view=timeline`}
         className={styles.eventLink}
-        aria-label={`${t(item.timelineTitle.en, item.timelineTitle.zh)} · ${t('View record', '查看详情')}`}
+        aria-label={`${t(item.timelineTitle.en, item.timelineTitle.zh)}${span ? ` · ${item.startDate} — ${t('Present', '至今')}` : ''} · ${t('View record', '查看详情')}`}
         aria-current={focused ? 'true' : undefined}
         tabIndex={interactive ? 0 : -1}
         onFocus={event => { if (event.currentTarget.matches(':focus-visible')) onKeyboardFocus() }}
         draggable={false}
       >
+        <div className={`${styles.eventContent} ${span ? styles.ongoingContent : ''}`}>
         <div className={styles.eventType}>
           <span><Icon size={12} aria-hidden="true" />{t(category.en, category.zh)}</span>
-          <span className={styles.eventSerial}>{group.ids.length > 1 ? `${index + 1} / ${group.ids.length}` : item.serial.slice(-3)}</span>
+          {span ? <span className={styles.ongoingBadge}><i />{t('Ongoing', '进行中')}</span> : <span className={styles.eventSerial}>{group.ids.length > 1 ? `${index + 1} / ${group.ids.length}` : item.serial.slice(-3)}</span>}
         </div>
         <h3>{t(item.timelineTitle.en, item.timelineTitle.zh)}</h3>
-        <p className={styles.eventRole}>{t(item.role.en, item.role.zh)}</p>
+        <p className={styles.eventRole}>{span && <>{t(item.organization.en, item.organization.zh)} · </>}{t(item.role.en, item.role.zh)}</p>
         <motion.p className={styles.eventSummary} style={{ opacity: reduceMotion ? 1 : summaryOpacity, height: summaryHeight, marginTop: summaryGap }}>
           {t(item.summary.en, item.summary.zh)}
         </motion.p>
-        <span className={styles.eventOpen}>{t('Open record', '打开档案')}<ArrowUpRight size={13} aria-hidden="true" /></span>
+        <span className={styles.eventOpen}>
+          {span && <span className={styles.ongoingDates}>{item.startDate.replace('-', '.')} — {t('NOW', '至今')}</span>}
+          <span className={styles.recordAction}>{t('Open record', '打开档案')}<ArrowUpRight size={13} aria-hidden="true" /></span>
+        </span>
+        </div>
       </Link>
     </motion.div>
   )
 }
 
-function EventGroup({ group, items, travel, timeX, width, metrics, focusId, onKeyboardFocus }: {
+function EventGroup({ group, items, travel, timeX, width, metrics, focusId, ongoingSpans, onKeyboardFocus }: {
   group: ExperienceEventGroup
   items: Experience[]
   travel: MotionValue<number>
@@ -89,6 +102,7 @@ function EventGroup({ group, items, travel, timeX, width, metrics, focusId, onKe
   width: number
   metrics: ExperienceTimelineMetrics
   focusId: string
+  ongoingSpans: Map<string, OngoingSpan>
   onKeyboardFocus: (id: string) => void
 }) {
   const { t } = useLanguage()
@@ -112,6 +126,7 @@ function EventGroup({ group, items, travel, timeX, width, metrics, focusId, onKe
         metrics={metrics}
         compact={compact}
         focused={focusId === id}
+        span={ongoingSpans.get(id)}
         onKeyboardFocus={() => onKeyboardFocus(id)}
       />)}
     </div>
@@ -134,9 +149,12 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
   const metrics = useMemo(() => experienceTimelineMetrics(width, height), [width, height])
   const layout = useMemo(() => buildExperienceTimeline(items, asOfDate, metrics), [items, asOfDate, metrics])
   const visibleIds = useMemo(() => new Set(visibleItems.map(item => item.id)), [visibleItems])
-  const journey = useMemo(() => buildExperienceJourney(layout, visibleIds), [layout, visibleIds])
+  const journey = useMemo(() => buildExperienceJourney(layout, visibleIds, width), [layout, visibleIds, width])
   const stops = journey.stops
   const periods = layout.periods.filter(({ item }) => visibleIds.has(item.id) || visibleItems.some(event => event.parentId === item.id))
+  const ongoingSpans = useMemo(() => new Map(layout.periods
+    .filter(({ item }) => item.category !== 'education' && item.endDate === null)
+    .map(({ item, start, end }) => [item.id, { start, end }])), [layout])
   const railRef = useRef<HTMLDivElement>(null)
   const markerRef = useRef<HTMLSpanElement>(null)
   const rangeRef = useRef<HTMLInputElement>(null)
@@ -156,7 +174,7 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
   const progress = useTransform(travel, value => value / journey.width)
   const currentIndex = Math.max(0, stops.findIndex(stop => stop.id === focusId))
   const focusedItem = items.find(item => item.id === focusId) ?? visibleItems[0]
-  const entryAnchor = layout.stops.find(stop => stop.id === focusId)?.x ?? 0
+  const entryAnchor = timelineTimeAt(journey, stops.find(stop => stop.id === focusId)?.x ?? 0)
   const cursorSignature = stops.map(stop => `${stop.id}:${stop.x}`).join('|')
 
   const animateTo = useCallback((destination: number) => {
@@ -277,6 +295,14 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
       clearTimeout(timerRef.current)
       timerRef.current = setTimeout(() => {
         const stop = nearestStop(rail.scrollLeft)
+        const span = ongoingSpans.get(stop.id)
+        if (span) {
+          const currentTime = timelineTimeAt(journey, rail.scrollLeft)
+          const boundedTime = Math.max(span.start, Math.min(span.end, currentTime))
+          // Allow free exploration within a current appointment, including NOW.
+          if (boundedTime !== currentTime) animateTo(rail.scrollLeft + boundedTime - currentTime)
+          return
+        }
         if (Math.abs(stop.x - rail.scrollLeft) > 1) animateTo(stop.x)
       }, 180)
     }
@@ -298,7 +324,7 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
       rail.removeEventListener('wheel', onWheel)
       clearTimeout(timerRef.current)
     }
-  }, [stops, travel, nearestStop, onFocusChange, animateTo, journey.width, ready])
+  }, [stops, travel, nearestStop, onFocusChange, animateTo, journey, ongoingSpans, ready])
 
   useEffect(() => () => {
     cancelAnimationFrame(frameRef.current)
@@ -340,12 +366,17 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
               return (
                 <div key={tick.date} className={styles.tick} style={{ left: tick.x, '--entry-delay': `${.42 + Math.min(.32, Math.abs(tick.x - entryAnchor) / Math.max(1, width) * .32)}s` } as CSSProperties} data-major={tick.major} data-event={isEventDate} data-boundary={isBoundaryDate} data-selected={selectedDate}>
                   <span aria-hidden="true" />
-                  {(tick.major || isEventDate || isBoundaryDate) && <><i className={styles.datePlaceholder} aria-hidden="true">----.--</i><time dateTime={tick.date}>{tick.date.replace('-', '.')}</time></>}
+                  {tick.date !== asOfDate.slice(0, 7) && (tick.major || isEventDate || isBoundaryDate) && <><i className={styles.datePlaceholder} aria-hidden="true">----.--</i><time dateTime={tick.date}>{tick.date.replace('-', '.')}</time></>}
                 </div>
               )
             })}
 
-            {periods.map(({ item, start, end, lane }) => {
+            <div className={`${styles.tick} ${styles.nowTick}`} style={{ left: layout.now.x, '--entry-delay': '.5s' } as CSSProperties} data-now-date={layout.now.date}>
+              <span aria-hidden="true" />
+              <time dateTime={layout.now.date}>{t('NOW', '今天')} · {layout.now.date.replaceAll('-', '.')}</time>
+            </div>
+
+            {periods.filter(({ item }) => !ongoingSpans.has(item.id)).map(({ item, start, end, lane }) => {
               const active = focusId === item.id || focusedItem?.parentId === item.id
               const category = experienceCategories[item.category]
               const Icon = category.icon
@@ -381,6 +412,7 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
               width={width}
               metrics={metrics}
               focusId={focusId}
+              ongoingSpans={ongoingSpans}
               onKeyboardFocus={focusCard}
             />)}
           </motion.div>

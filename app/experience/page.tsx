@@ -13,5 +13,5 @@ export default function ExperiencePage() {
     (b.endDate ?? '9999-12').localeCompare(a.endDate ?? '9999-12')
   ))
 
-  return <ExperienceContent items={items} asOfDate={new Date().toISOString().slice(0, 7)} />
+  return <ExperienceContent items={items} asOfDate={new Date().toISOString().slice(0, 10)} />
 }
