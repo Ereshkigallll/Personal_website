@@ -1,9 +1,9 @@
 .page {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  min-height: var(--page-height);
   min-width: 0;
-  padding-block: clamp(12px, 1.5vh, 24px);
+  padding-block: 0;
 }
 
 .shell {
@@ -22,7 +22,7 @@
 .card { min-height: min(76dvh, 1120px); }
 .identity { min-width: 0; padding: clamp(24px, 3cqw, 64px); }
 .sidebar { min-width: 0; padding: clamp(24px, 2.5cqw, 56px); }
-.name { font-size: clamp(2.5rem, 5.4cqw, 6rem); overflow-wrap: anywhere; }
+.name { font-size: clamp(2.5rem, min(5.4cqw, 9dvh), 6rem); overflow-wrap: anywhere; }
 .sectionGap { margin-top: clamp(24px, 2cqw, 36px); }
 .quote { font-size: 1em; max-width: 42ch; min-height: 3.5em; }
 .stats { max-width: 30rem; }
@@ -30,6 +30,69 @@
 .clockDate { flex: 1 1 12em; }
 .focusCard { display: flex; padding: clamp(14px, 1.05cqw, 20px); gap: 16px; }
 .metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.quickLinks { display: grid; gap: 12px; }
+
+/* Use the window's height as well as its width; OS scaling reduces both. */
+@media (min-width: 1024px) {
+  .card { min-height: min(76dvh, 1120px, calc(var(--page-height) - 50px)); }
+}
+
+@media (min-width: 1024px) and (max-height: 950px) {
+  .card, .ticker { font-size: clamp(1rem, calc(.75rem + .4cqw), 1.125rem); }
+  .identity, .sidebar { padding: clamp(20px, 2.3dvh, 28px); }
+  .sidebar { gap: clamp(12px, 1.8dvh, 18px); }
+  .sectionGap { margin-top: clamp(12px, 1.8dvh, 18px); }
+  .avatarRow { margin-bottom: 18px; }
+  .discipline { margin-bottom: 16px; }
+  .underline { margin-bottom: 16px; }
+  .quote { min-height: 0; }
+  .stats { padding-top: 16px; }
+  .panelHeading { padding-bottom: 8px; margin-bottom: 12px; }
+  .focusCard { padding: 10px 12px; gap: 12px; }
+  .metrics > div { padding: 10px; }
+  .clock { gap: 6px; }
+  .clockDate { flex-basis: 10em; }
+  .quickLinks { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 8px; margin-top: 12px; }
+  .matrixLink, .emailLink { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 44px; padding: 8px 10px; }
+  .matrixLink { text-align: center; }
+  .emailLink { gap: 6px; }
+  .emailLink > div { gap: 6px; }
+}
+
+@media (min-width: 1024px) and (max-height: 760px) {
+  .card, .ticker { font-size: clamp(1rem, calc(.75rem + .4cqw), 1.0625rem); }
+  .identity, .sidebar { padding: 18px; }
+  .sidebar { gap: 10px; }
+  .sectionGap { margin-top: 12px; }
+  .avatarRow { margin-bottom: 12px; }
+  .avatarRow > div:first-child { width: 56px; height: 56px; }
+  .discipline, .underline { margin-bottom: 12px; }
+  .focusCard { padding-block: 8px; }
+  .panelHeading { padding-bottom: 6px; margin-bottom: 10px; }
+  .focusList > li + li { margin-top: 6px; }
+  .quoteBlock { padding: 12px; }
+  .stats { padding-top: 12px; }
+  .metrics > div { padding: 8px 10px; }
+  .energyTrack { margin-top: 8px; }
+  .energyState { margin-top: 4px; }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .identity, .sidebar { grid-column: span 6 / span 6; }
+}
+
+@media (min-width: 1024px) and (max-height: 700px) {
+  .identity, .sidebar { padding: 14px; }
+  .sectionGap { margin-top: 10px; }
+  .avatarRow, .discipline, .underline { margin-bottom: 8px; }
+  .name { font-size: clamp(2.5rem, min(5.4cqw, 8dvh), 6rem); }
+  .quoteBlock { padding: 8px; }
+  .stats { padding-top: 8px; }
+  .focusMeta { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; align-items: baseline; }
+  .focusMeta > span:first-child { grid-column: 2; grid-row: 1; margin-bottom: 0; }
+  .focusMeta > span:nth-child(2) { grid-column: 1; grid-row: 1; }
+  .focusMeta > span:last-child { grid-column: 1 / -1; }
+}
 
 @container (max-width: 320px) {
   .metrics { grid-template-columns: minmax(0, 1fr); }

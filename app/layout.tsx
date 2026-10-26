@@ -40,12 +40,11 @@ export default function RootLayout({
                 <TopBar />
 
                 <div
-                  className="relative z-10 h-screen flex flex-col"
+                  className="app-shell relative z-10 flex flex-col"
                   style={{ marginLeft: 'var(--sidebar-width)' }}
                 >
                   <main
-                    className="flex-1 overflow-y-auto px-4 sm:px-8 pb-8"
-                    style={{ paddingTop: 'calc(var(--topbar-height) + 1.5rem)' }}
+                    className="page-viewport flex-1 overflow-y-auto px-4 sm:px-8"
                   >
                     {children}
                   </main>

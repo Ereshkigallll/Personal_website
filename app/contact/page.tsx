@@ -75,7 +75,7 @@ export default function ContactPage() {
 
                 {/* Panel header */}
                 <div
-                  className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-3"
+                  className={`${styles.formHeading} flex flex-wrap items-center justify-between gap-3 mb-6 pb-3`}
                   style={{
                     backgroundImage: 'linear-gradient(to right, var(--color-border) 50%, transparent 50%)',
                     backgroundPosition: 'bottom',
@@ -159,7 +159,7 @@ export default function ContactPage() {
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-breathe shrink-0" />
                   System Status
                 </h3>
-                <div className="space-y-3">
+                <div className={`${styles.statusRows} space-y-3`}>
                   <div className="flex justify-between items-center pb-2 border-b border-[var(--color-border)]">
                     <span className="font-mono text-[0.8em] text-[var(--color-muted)]">UPLINK_STABILITY</span>
                     <span className="font-mono text-[0.8em] font-bold">99.8%</span>
@@ -180,7 +180,7 @@ export default function ContactPage() {
                 <h3 className="font-mono text-[0.875em] font-bold text-[var(--color-muted)] uppercase tracking-wider mb-4">
                   External Nodes
                 </h3>
-                <div className="flex flex-col gap-3">
+                <div className={`${styles.nodeList} flex flex-col gap-3`}>
                   {externalNodes.map(({ id, label, sublabel, href, icon }) => (
                     <a
                       key={id}
@@ -211,18 +211,17 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Security notice */}
-              <div className={`panel-acrylic ${styles.notice}`}>
-                <p className="font-mono text-[0.8em] text-[var(--color-muted)] leading-relaxed uppercase tracking-wide">
-                  All transmissions are monitored by information security protocols. Please refrain from sending classified data over unsecured channels.
-                </p>
-              </div>
-
             </div>
           </div>
 
+          <div className={`panel-acrylic ${styles.notice}`}>
+            <p className="font-mono text-[0.8em] text-[var(--color-muted)] leading-relaxed uppercase tracking-wide">
+              All transmissions are monitored by information security protocols. Please refrain from sending classified data over unsecured channels.
+            </p>
+          </div>
+
           {/* ── Footer ── */}
-          <footer className="pt-4 border-t border-[var(--color-border)] flex flex-wrap justify-between items-center gap-4">
+          <footer className={`${styles.footer} pt-4 border-t border-[var(--color-border)] flex flex-wrap justify-between items-center gap-4`}>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 shrink-0 bg-[var(--color-accent)]" />
               <span className="font-mono text-[0.8em] text-[var(--color-muted)] uppercase tracking-widest">

@@ -224,7 +224,7 @@ function EmailButton() {
     <a
       href={addr ? `mailto:${addr}` : undefined}
       onClick={e => { if (!addr) e.preventDefault() }}
-      className="group flex items-center justify-between gap-3 border border-[var(--color-border)] bg-[var(--color-surface)]/50 px-4 py-3 hover:border-[var(--color-accent)] hover:shadow-btn-glow transition-all"
+      className={`${styles.emailLink} group flex items-center justify-between gap-3 border border-[var(--color-border)] bg-[var(--color-surface)]/50 px-4 py-3 hover:border-[var(--color-accent)] hover:shadow-btn-glow transition-all`}
     >
       <div className="flex items-center gap-3 min-w-0">
         <Mail size={16} className="shrink-0 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors" />
@@ -449,7 +449,7 @@ export default function ProfileContent() {
 
             <div>
               {/* Avatar + ID badge */}
-              <div className="flex items-center gap-4 mb-8">
+              <div className={`${styles.avatarRow} flex items-center gap-4 mb-8`}>
                 <GeometricAvatar />
                 <div className="flex flex-col gap-1.5">
                   <div className="inline-flex items-center gap-2 self-start border border-[var(--color-border)] px-2 py-1 bg-[var(--color-surface)]/50">
@@ -469,10 +469,10 @@ export default function ProfileContent() {
                 {profile.name}
               </h1>
               {/* Accent underline */}
-              <div ref={sourceRef} data-entry-source-ready={revealed} className="h-1 w-24 bg-[var(--color-accent)] mb-6" />
+              <div ref={sourceRef} data-entry-source-ready={revealed} className={`${styles.underline} h-1 w-24 bg-[var(--color-accent)] mb-6`} />
 
               {/* Department */}
-              <div className="space-y-1 mb-6">
+              <div className={`${styles.discipline} space-y-1 mb-6`}>
                 <p className="font-mono text-[0.8em] text-[var(--color-muted)] uppercase tracking-wider">
                   {t('Discipline', '专业领域')}
                 </p>
@@ -492,7 +492,7 @@ export default function ProfileContent() {
               </div>
 
               {/* Personal motto — typed out */}
-              <blockquote className={`${styles.sectionGap} p-4 bg-[var(--color-bg)]/70 border-l-2 border-[var(--color-accent)]`}>
+              <blockquote className={`${styles.sectionGap} ${styles.quoteBlock} p-4 bg-[var(--color-bg)]/70 border-l-2 border-[var(--color-accent)]`}>
                 <p className={`${styles.quote} font-mono leading-relaxed text-[var(--color-muted)]`}>
                   “{bioShown}”{!bioDone && <span className="text-[var(--color-accent)] animate-pulse">▋</span>}
                 </p>
@@ -544,20 +544,20 @@ export default function ProfileContent() {
 
             {/* Current robotics directions */}
             <div>
-              <h2 className="font-mono text-[0.8em] font-bold uppercase tracking-widest border-b border-[var(--color-border)] pb-3 mb-5 flex justify-between items-center">
+              <h2 className={`${styles.panelHeading} font-mono text-[0.8em] font-bold uppercase tracking-widest border-b border-[var(--color-border)] pb-3 mb-5 flex justify-between items-center`}>
                 <span>{t('Current Robotics Focus', '当前机器人方向')}</span>
                 <span className="text-[1em] text-[var(--color-muted)] tabular-nums">
                   {String(profile.currentFocus.length).padStart(2, '0')}
                 </span>
               </h2>
 
-              <ul className="space-y-2.5">
+              <ul className={`${styles.focusList} space-y-2.5`}>
                 {profile.currentFocus.map(({ key, title, sub }) => (
                   <li key={key} className="group transform transition-transform hover:translate-x-1">
                     <Link href="/experience/westlake-robotics?view=timeline" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]">
                       <div className={`${styles.focusCard} clip-key bg-[var(--color-surface)] border border-[var(--color-border)] group-hover:border-[var(--color-accent)]/50 group-hover:shadow-key-glow items-center justify-between relative overflow-hidden transition-all`}>
                         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--color-border)] group-hover:bg-[var(--color-accent)] transition-colors" />
-                        <div className="pl-3 min-w-0">
+                        <div className={`${styles.focusMeta} pl-3 min-w-0`}>
                           <span className="font-mono text-[0.75em] text-[var(--color-muted)] group-hover:text-[var(--color-accent)] block mb-0.5 transition-colors">{key}</span>
                           <span className="font-bold text-[1em] block leading-snug">{t(title.en, title.zh)}</span>
                           <span className="font-mono text-[0.75em] text-[var(--color-muted)] mt-0.5 block">{t(sub.en, sub.zh)}</span>
@@ -569,30 +569,23 @@ export default function ProfileContent() {
                 ))}
               </ul>
 
-              {/* Enter Database button */}
-              <div className="mt-4">
-                <Link href="/database">
-                  <button className="w-full group relative overflow-hidden border border-[var(--color-accent)]/40 hover:border-[var(--color-accent)] bg-black/5 transition-all duration-300 py-3 px-4 hover:shadow-btn-glow">
-                    <div className="absolute inset-0 bg-[var(--color-accent)]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                    <div className="relative flex items-center justify-center gap-2.5">
-                      <Database size={16} className="text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors" />
-                      <span className="font-mono text-[0.8em] font-bold tracking-widest text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">
-                        {t('ENTER MATRIX', '进入技能矩阵')}
-                      </span>
-                    </div>
-                  </button>
+              <div className={`${styles.quickLinks} mt-4`}>
+                <Link href="/database" className={`${styles.matrixLink} block w-full group relative overflow-hidden border border-[var(--color-accent)]/40 hover:border-[var(--color-accent)] bg-black/5 transition-all duration-300 py-3 px-4 hover:shadow-btn-glow`}>
+                  <div className="absolute inset-0 bg-[var(--color-accent)]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                  <div className="relative flex items-center justify-center gap-2.5">
+                    <Database size={16} className="text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors" />
+                    <span className="font-mono text-[0.8em] font-bold tracking-widest text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">
+                      {t('ENTER MATRIX', '进入技能矩阵')}
+                    </span>
+                  </div>
                 </Link>
-              </div>
-
-              {/* Email uplink */}
-              <div className="mt-3">
                 <EmailButton />
               </div>
             </div>
 
             {/* System Metrics */}
             <div className="mt-auto">
-              <h2 className="font-mono text-[0.8em] font-bold uppercase tracking-widest border-b border-[var(--color-border)] pb-3 mb-5">
+              <h2 className={`${styles.panelHeading} font-mono text-[0.8em] font-bold uppercase tracking-widest border-b border-[var(--color-border)] pb-3 mb-5`}>
                 {t('System Metrics', '系统状态')}
               </h2>
               <div className={styles.metrics}>
@@ -604,10 +597,10 @@ export default function ProfileContent() {
                     </span>
                     <span className="font-mono text-[0.8em] font-bold text-[var(--color-accent)]">98%</span>
                   </div>
-                  <div className="w-full bg-[var(--color-border)] h-1.5 mt-4 overflow-hidden">
+                  <div className={`${styles.energyTrack} w-full bg-[var(--color-border)] h-1.5 mt-4 overflow-hidden`}>
                     <div className="bg-[var(--color-text)] h-full" style={{ width: '98%' }} />
                   </div>
-                  <div className="mt-2 font-mono text-[0.75em] text-[var(--color-muted)] text-right tracking-widest">
+                  <div className={`${styles.energyState} mt-2 font-mono text-[0.75em] text-[var(--color-muted)] text-right tracking-widest`}>
                     {t('STABLE', '稳定')}
                   </div>
                 </div>

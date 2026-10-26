@@ -53,6 +53,20 @@
 .skillLabel > span:first-child { min-width: 0; }
 .skillLabel > span:last-child { flex-shrink: 0; }
 
+@media (min-width: 1024px) {
+  .viewportPage { min-height: var(--page-height); justify-content: center; }
+  .viewportPage .skillGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) and (max-height: 850px) {
+  .viewportPage { gap: 16px; }
+  .viewportPage .panelPadding, .viewportPage .skillPanel { padding: 20px; }
+  .viewportPage .title { font-size: clamp(2rem, 3cqw, 3rem); }
+  .viewportPage .skillRows { gap: 20px; }
+  .viewportPage .skillPanelHeading { margin-bottom: 20px; }
+  .viewportPage .skillLabel { margin-bottom: 8px; }
+}
+
 .logLayout { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(20px, 1.5cqw, 28px); }
 .logSidebar { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .logSidePanel { min-width: 0; padding: clamp(20px, 1.6cqw, 30px); }

@@ -87,7 +87,7 @@ export default function DatabaseContent() {
 
   return (
     <PageEntrance page="database" records={skillCategories.map(category => ({ id: category.id, label: t(category.label.en, category.label.zh), meta: String(category.skills.length).padStart(2, '0') }))}>
-      <PageLayout>
+      <PageLayout fitViewport>
 
         {/* ── Header ── */}
         <div className={`panel-acrylic ${styles.panelPadding}`}>
@@ -111,7 +111,7 @@ export default function DatabaseContent() {
         >
           {skillCategories.map(({ id, label, skills }, colIdx) => (
             <motion.div key={id} variants={colVariants} className={`panel-acrylic flex flex-col ${styles.skillPanel}`}>
-              <div className="flex items-center gap-4 mb-8">
+              <div className={`${styles.skillPanelHeading} flex items-center gap-4 mb-8`}>
                 <h3 className={`${styles.skillHeading} font-mono font-bold uppercase text-[var(--color-muted)]`}>
                   {t(label.en, label.zh)}
                 </h3>

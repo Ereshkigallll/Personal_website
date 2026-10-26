@@ -4,16 +4,33 @@ export const TIMELINE_CARD_WIDTH = 304
 export const TIMELINE_GROUP_GAP = 20
 export const TIMELINE_REVEAL_DISTANCE = 220
 
-/** Use the rail's CSS width so display scaling and browser zoom are respected. */
-export function experienceTimelineMetrics(railWidth: number) {
-  const scale = Math.round(Math.max(1, Math.min(1.35, railWidth / 1440)) * 100) / 100
+/** Size against the actual rail and remaining panel height, including OS/browser scaling. */
+export function experienceTimelineMetrics(railWidth: number, height = 0) {
+  const compact = height > 0 && height < 620
+  const dense = compact && height < 474
+  // Reserve two overlapping period lanes, the card-to-axis gap and the readout.
+  const heightScale = height > 0 ? (height - 58) / (252 + 20 + 92 + 200) : 1.35
+  const scale = compact ? 1 : Math.floor(Math.max(1, Math.min(1.35, railWidth / 1440, heightScale)) * 100) / 100
+  const periodHeight = (dense ? 36 : compact ? 40 : 56) * scale
+  const secondaryPeriodHeight = (dense ? 24 : compact ? 28 : 32) * scale
+  const periodStep = (dense ? 40 : compact ? 44 : 60) * scale
+  const periodGap = (dense ? 8 : compact ? 12 : 20) * scale
+  const bottomSpace = (compact ? 126 : 200) * scale
+  const availableCardHeight = height - 58 - periodStep - secondaryPeriodHeight - periodGap - bottomSpace
   return {
     scale,
+    compact,
+    dense,
     cardWidth: railWidth > 0 ? Math.min(TIMELINE_CARD_WIDTH * scale, Math.max(216, railWidth - 32)) : TIMELINE_CARD_WIDTH,
-    cardHeight: 252 * scale,
-    collapsedHeight: 172 * scale,
-    summaryHeight: 70 * scale,
-    summaryGap: 12 * scale,
+    cardHeight: compact ? Math.max(dense ? 188 : 206, Math.min(252, availableCardHeight)) : 252 * scale,
+    collapsedHeight: (compact ? 150 : 172) * scale,
+    summaryHeight: (compact ? 46 : 70) * scale,
+    summaryGap: (dense ? 6 : compact ? 8 : 12) * scale,
+    periodHeight,
+    secondaryPeriodHeight,
+    periodStep,
+    periodGap,
+    bottomSpace,
     focusDistance: 348 * scale,
     monthWidth: 64 * scale,
   }

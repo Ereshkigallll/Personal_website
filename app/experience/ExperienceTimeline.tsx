@@ -130,8 +130,8 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
 }) {
   const { t } = useLanguage()
   const reduceMotion = useReducedMotion()
-  const [width, setWidth] = useState(0)
-  const metrics = useMemo(() => experienceTimelineMetrics(width), [width])
+  const [{ width, height }, setViewport] = useState({ width: 0, height: 0 })
+  const metrics = useMemo(() => experienceTimelineMetrics(width, height), [width, height])
   const layout = useMemo(() => buildExperienceTimeline(items, asOfDate, metrics), [items, asOfDate, metrics])
   const visibleIds = useMemo(() => new Set(visibleItems.map(item => item.id)), [visibleItems])
   const journey = useMemo(() => buildExperienceJourney(layout, visibleIds), [layout, visibleIds])
@@ -147,9 +147,9 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
   const lastJourney = useRef(journey)
   const restoredCursor = useRef(false)
   const ignoreScrollFocus = useRef(false)
-  const [axisY, setAxisY] = useState(340)
-  const periodStackHeight = ((layout.laneCount - 1) * 60 + (layout.laneCount > 1 ? 32 : 56)) * metrics.scale
-  const minAxisY = 58 + metrics.cardHeight + 20 * metrics.scale + periodStackHeight
+  const periodStackHeight = (layout.laneCount - 1) * metrics.periodStep + (layout.laneCount > 1 ? metrics.secondaryPeriodHeight : metrics.periodHeight)
+  const minAxisY = 58 + metrics.cardHeight + metrics.periodGap + periodStackHeight
+  const axisY = Math.max(minAxisY, Math.min(height * .54, height - metrics.bottomSpace))
   const travel = useMotionValue(0)
   const timeX = useTransform(travel, value => timelineTimeAt(journey, value))
   const coordinateShift = useTransform(travel, value => value - timelineTimeAt(journey, value))
@@ -211,12 +211,11 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
     const rail = railRef.current
     if (!rail) return
     const observer = new ResizeObserver(([entry]) => {
-      setWidth(entry.contentRect.width)
-      setAxisY(Math.max(minAxisY, (entry.contentRect.height + 118) * .54))
+      setViewport({ width: entry.contentRect.width, height: rail.parentElement?.clientHeight ?? 0 })
     })
     observer.observe(rail)
     return () => observer.disconnect()
-  }, [minAxisY])
+  }, [])
 
   // Restore the same record after changing view, resizing or returning from a detail page.
   useEffect(() => {
@@ -307,7 +306,7 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
   }, [])
 
   return (
-    <section className={styles.timeline} style={{ '--axis-y': `${axisY}px`, '--half-width': `${width / 2}px`, '--timeline-unit': `${metrics.scale}px`, '--entry-axis-center': `${entryAnchor + width / 2}px`, minHeight: Math.ceil(minAxisY + 200 * metrics.scale) } as CSSProperties} data-intro-stage={intro.stage} data-intro-active={intro.active} aria-busy={intro.stage !== 'complete'} aria-label={t('Interactive experience timeline', '交互式经历时间轴')}>
+    <section className={styles.timeline} style={{ '--axis-y': `${axisY}px`, '--half-width': `${width / 2}px`, '--timeline-unit': `${metrics.scale}px`, '--entry-axis-center': `${entryAnchor + width / 2}px` } as CSSProperties} data-compact={metrics.compact} data-dense={metrics.dense} data-intro-stage={intro.stage} data-intro-active={intro.active} aria-busy={intro.stage !== 'complete'} aria-label={t('Interactive experience timeline', '交互式经历时间轴')}>
       <div className={styles.timelineTopline}>
         <span><span className={styles.smallSquare} />{t('Newest to oldest', '由近及远')}</span>
         <span className={styles.timelineInstructions} id="timeline-help"><MoveHorizontal size={13} aria-hidden="true" />{t('SCROLL TO EXPLORE & UNFOLD · CLICK TO OPEN', '滚轮浏览与展开 · 点击查看详情')}</span>
@@ -355,7 +354,7 @@ export default function ExperienceTimeline({ items, visibleItems, asOfDate, focu
                   key={item.id}
                   href={`/experience/${item.id}?view=timeline`}
                   className={styles.period}
-                  style={{ left: start, width: Math.max(1, end - start), top: Math.max(0, axisY - 58 - metrics.cardHeight - 20 * metrics.scale - periodStackHeight) + lane * 60 * metrics.scale, '--entry-period-delay': `${.74 + lane * .08}s` } as CSSProperties}
+                  style={{ left: start, width: Math.max(1, end - start), height: lane === 0 ? metrics.periodHeight : metrics.secondaryPeriodHeight, top: Math.max(0, axisY - 58 - metrics.cardHeight - metrics.periodGap - periodStackHeight) + lane * metrics.periodStep, '--entry-period-delay': `${.74 + lane * .08}s` } as CSSProperties}
                   data-active={active}
                   data-lane={lane}
                   data-category={item.category}

@@ -60,15 +60,68 @@ textarea.field { min-height: 14rem; }
   gap: clamp(16px, 1.1cqw, 22px);
 }
 
-.sidebarPanel { padding: clamp(20px, 1.6cqw, 30px); }
+.sidebarPanel { padding: clamp(18px, 1.4cqw, 26px); }
 .notice { padding: clamp(18px, 1.3cqw, 24px); }
 .nodeLink { min-width: 0; gap: 12px; padding: clamp(12px, 1cqw, 18px); }
 .nodeIcon { width: 2.5em; height: 2.5em; }
 .nodeIcon svg { width: 1.2em; height: 1.2em; }
 .nodeText { min-width: 0; overflow-wrap: anywhere; gap: 2px; }
 
-@container (min-width: 1000px) {
-  .body { grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); }
+@container (min-width: 800px) {
+  .body { grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .page { height: var(--page-height); min-height: 560px; }
+  .body { flex: 1; min-height: 0; }
+  .formColumn, .formPanel, .form, .messageInput { min-height: 0; }
+  textarea.field { min-height: 120px; height: auto; }
+}
+
+@media (min-width: 1024px) and (max-height: 950px) {
+  .page { font-size: clamp(1rem, calc(.75rem + .4cqw), 1.125rem); }
+  .page, .body { gap: 14px; }
+  .header, .formPanel { padding: 20px 24px; }
+  .title { font-size: clamp(2rem, 3cqw, 3rem); }
+  .monogram { font-size: 2.5em; }
+  .form { gap: 16px; }
+  .formHeading { margin-bottom: 16px; padding-bottom: 10px; }
+  .sidebar { gap: 12px; }
+  .sidebarPanel { padding: 15px; }
+  .sidebarPanel h3 { margin-bottom: 12px; }
+  .nodeList { gap: 8px; }
+  .nodeLink { padding: 8px 12px; }
+  .nodeIcon { width: 2.25em; height: 2.25em; }
+  .notice { padding: 12px 20px; }
+  .footer { padding-top: 10px; gap: 8px; }
+}
+
+@media (min-width: 1024px) and (max-height: 850px) {
+  .page { font-size: clamp(1rem, calc(.75rem + .4cqw), 1.0625rem); }
+  .title { font-size: 2.25rem; }
+  .header { padding-block: 14px; }
+  .page { gap: 10px; }
+  .formPanel { padding: 16px 20px; }
+  .formHeading { margin-bottom: 12px; }
+  .form { gap: 12px; }
+  .statusRows > div + div { margin-top: 8px; }
+  .sidebarPanel h3 { margin-bottom: 8px; }
+  .sidebarPanel { padding: 12px 16px; }
+  .notice { padding-block: 8px; }
+  .nodeLink { padding-block: 6px; }
+  .statusRows > div { padding-bottom: 4px; }
+}
+
+@media (min-width: 1024px) and (max-height: 700px) {
+  .page { gap: 8px; }
+  .header { padding-block: 10px; }
+  .title { font-size: 2rem; }
+  .formHeading { padding-bottom: 8px; margin-bottom: 8px; }
+  .form { gap: 10px; }
+  .statusRows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .statusRows > div { flex-direction: column; align-items: flex-start; gap: 4px; border: 0; padding: 0; justify-content: space-between; }
+  .statusRows > div + div { margin-top: 0; }
+  .statusRows span { overflow-wrap: anywhere; font-size: .75em; }
 }
 
 @container (max-width: 600px) {
